@@ -1,0 +1,579 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gentle-bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-4px);
+  }
+  60% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(59, 130, 246, 0.6);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out;
+}
+
+.animate-progress {
+  animation: progress 4s linear;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.8s ease-out;
+}
+
+.animate-gentle-bounce {
+  animation: gentle-bounce 2s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* Enhanced typography */
+.leading-loose {
+  line-height: 1.8;
+}
+
+.leading-extra-loose {
+  line-height: 2;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced font weights */
+.font-light {
+  font-weight: 300;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+/* Mobile-first responsive design improvements */
+@media (max-width: 640px) {
+  /* Improved text scaling for mobile */
+  .text-5xl {
+    font-size: 2.25rem;
+    line-height: 1.1;
+  }
+  
+  .text-7xl {
+    font-size: 2.75rem;
+    line-height: 1.1;
+  }
+  
+  /* Better touch targets */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Improved spacing for mobile */
+  .space-y-8 > * + * {
+    margin-top: 1.5rem;
+  }
+  
+  /* Better padding for mobile sections */
+  .py-20 {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+  
+  /* Improved mobile grid gaps */
+  .gap-8 {
+    gap: 1rem;
+  }
+  
+  .gap-6 {
+    gap: 0.75rem;
+  }
+  
+  /* Mobile typography adjustments */
+  .leading-loose {
+    line-height: 1.6;
+  }
+  
+  /* Better mobile paragraph spacing */
+  p {
+    margin-bottom: 1rem;
+  }
+  
+  /* Improved mobile font sizes */
+  .text-sm {
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+  
+  .text-base {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+}
+
+/* Enhanced tablet responsiveness */
+@media (min-width: 641px) and (max-width: 1024px) {
+  /* Better spacing for tablets */
+  .py-20 {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+  
+  /* Improved grid gaps for tablets */
+  .gap-8 {
+    gap: 1.5rem;
+  }
+  
+  /* Tablet typography */
+  .leading-loose {
+    line-height: 1.75;
+  }
+}
+
+/* Desktop typography enhancements */
+@media (min-width: 1025px) {
+  .leading-loose {
+    line-height: 1.8;
+  }
+  
+  .leading-extra-loose {
+    line-height: 2;
+  }
+  
+  /* Better paragraph spacing on larger screens */
+  p {
+    margin-bottom: 1.25rem;
+  }
+}
+
+/* Touch-friendly interactions */
+.touch-manipulation {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #6b7280;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Enhanced focus styles for accessibility */
+button:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
+
+/* Dark mode focus styles */
+.dark button:focus,
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  outline: 2px solid #818cf8;
+  outline-offset: 2px;
+}
+
+/* Improved mobile typography */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1.2;
+  }
+  
+  /* Better text wrapping */
+  .break-words {
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+  
+  /* Mobile-specific paragraph adjustments */
+  p {
+    max-width: 100%;
+    padding: 0 0.5rem;
+  }
+}
+
+/* Loading animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Bounce animation for scroll indicator */
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    transform: translate3d(0,-30px,0);
+  }
+  70% {
+    transform: translate3d(0,-15px,0);
+  }
+  90% {
+    transform: translate3d(0,-4px,0);
+  }
+}
+
+.animate-bounce {
+  animation: bounce 1s infinite;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Ping animation for ripple effect */
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-ping {
+  animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+/* Gradient text */
+.bg-gradient-to-r {
+  background: linear-gradient(to right, var(--tw-gradient-stops));
+}
+
+.bg-clip-text {
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.text-transparent {
+  color: transparent;
+}
+
+/* Custom utilities */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Enhanced hover states for desktop */
+@media (hover: hover) and (pointer: fine) {
+  .hover\:scale-105:hover {
+    transform: scale(1.05);
+  }
+  
+  .hover\:-translate-y-1:hover {
+    transform: translateY(-0.25rem);
+  }
+  
+  .hover\:shadow-xl:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  /* Enhanced hover animations */
+  .hover\:rotate-6:hover {
+    transform: rotate(6deg);
+  }
+  
+  .hover\:scale-110:hover {
+    transform: scale(1.1);
+  }
+  
+  /* Project card hover effects */
+  .hover\:scale-\[1\.02\]:hover {
+    transform: scale(1.02);
+  }
+  
+  .hover\:-translate-y-2:hover {
+    transform: translateY(-0.5rem);
+  }
+}
+
+/* Disable hover effects on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .hover\:scale-105:hover {
+    transform: none;
+  }
+  
+  .hover\:-translate-y-1:hover {
+    transform: none;
+  }
+  
+  .hover\:shadow-xl:hover {
+    box-shadow: none;
+  }
+  
+  .hover\:rotate-6:hover {
+    transform: none;
+  }
+  
+  .hover\:scale-110:hover {
+    transform: none;
+  }
+  
+  .hover\:scale-\[1\.02\]:hover {
+    transform: none;
+  }
+  
+  .hover\:-translate-y-2:hover {
+    transform: none;
+  }
+}
+
+/* Improved accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Disable transforms for reduced motion */
+  .hover\:scale-105:hover,
+  .hover\:-translate-y-1:hover,
+  .hover\:rotate-6:hover,
+  .hover\:scale-110:hover,
+  .hover\:scale-\[1\.02\]:hover,
+  .hover\:-translate-y-2:hover {
+    transform: none !important;
+  }
+}
+
+/* Better text selection */
+::selection {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.dark ::selection {
+  background-color: #818cf8;
+  color: white;
+}
+
+/* Improved mobile navigation */
+@media (max-width: 768px) {
+  .mobile-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+  }
+}
+
+/* Enhanced mobile grid layouts */
+@media (max-width: 640px) {
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+  
+  .grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+}
+
+/* Better mobile text sizing */
+@media (max-width: 480px) {
+  .text-4xl {
+    font-size: 1.875rem;
+    line-height: 1.1;
+  }
+  
+  .text-3xl {
+    font-size: 1.5rem;
+    line-height: 1.2;
+  }
+  
+  .text-2xl {
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+}
+
+/* Enhanced mobile padding and margins */
+@media (max-width: 640px) {
+  .px-4 {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .py-4 {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+  
+  .mb-8 {
+    margin-bottom: 1.5rem;
+  }
+  
+  .mt-8 {
+    margin-top: 1.5rem;
+  }
+}
+
+/* Enhanced visual dividers */
+.visual-divider {
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.3), transparent);
+  height: 1px;
+  margin: 1rem 0;
+}
+
+.dark .visual-divider {
+  background: linear-gradient(90deg, transparent, rgba(129, 140, 248, 0.3), transparent);
+}
+
+/* Improved card animations */
+.card-hover-effect {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover-effect:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Staggered animation delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Enhanced button hover effects */
+.btn-glow:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+/* Project card specific animations */
+.project-card {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.project-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Enhanced modal animations */
+.modal-enter {
+  animation: slide-up 0.4s ease-out;
+}
+
+/* Improved spacing for sections */
+.section-spacing {
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .section-spacing {
+    margin-bottom: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-spacing {
+    margin-bottom: 4rem;
+  }
+}
