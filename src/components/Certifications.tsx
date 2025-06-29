@@ -62,7 +62,7 @@ const Certifications = () => {
       issuer: 'Saylor Academy',
       date: '2022',
       description: 'In-depth study of operating systems principles and network fundamentals.',
-      badge: 'https://images.pexels.com/photos/8386422/pexels-photo-8386422.jpeg?auto=compress&cs=tinysrgb&w=100',
+      badge: '/image copy copy copy copy.png',
       credentialUrl: '#',
       skills: ['Operating Systems', 'System Design', 'Networks', 'Performance']
     },
