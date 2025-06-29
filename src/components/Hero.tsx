@@ -61,10 +61,10 @@ const Hero = () => {
               }`}>
                 Hello, I'm{' '}
                 <span className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent relative group cursor-default hover:from-indigo-500 hover:via-purple-500 hover:to-blue-500 transition-all duration-500">
-                  Mahesh
+                  Mahesh Chitikeshi
                   {/* Subtle glow effect on hover */}
                   <span className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent opacity-0 group-hover:opacity-30 blur-sm transition-all duration-500 pointer-events-none">
-                    Mahesh
+                    Mahesh Chitikeshi
                   </span>
                 </span>
               </h1>
