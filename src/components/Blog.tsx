@@ -650,35 +650,39 @@ print(svd_recs)</pre>
                   className="w-full h-40 sm:h-48 md:h-64 object-cover"
                 />
                 
-                {/* Enhanced Header with Back Button and Close Button */}
-                <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 right-2 sm:right-3 md:right-4 flex justify-between items-start">
-                  <div className="flex flex-col space-y-1 sm:space-y-2">
+                {/* Fixed Header with Proper Alignment */}
+                <div className="absolute top-3 sm:top-4 left-3 sm:left-4 right-3 sm:right-4 flex justify-between items-start">
+                  <div className="flex flex-col space-y-2">
                     {/* Back Button */}
                     <button
                       onClick={handleBackToList}
-                      className="flex items-center space-x-1 bg-white/90 dark:bg-gray-900/90 text-gray-900 dark:text-white px-2 sm:px-3 py-1 sm:py-1.5 rounded-full hover:bg-white dark:hover:bg-gray-900 transition-all duration-200 text-xs sm:text-sm font-medium touch-manipulation group shadow-lg"
+                      className="flex items-center space-x-2 bg-white/95 dark:bg-gray-900/95 text-gray-900 dark:text-white px-3 py-2 rounded-full hover:bg-white dark:hover:bg-gray-900 transition-all duration-200 text-sm font-medium touch-manipulation group shadow-lg backdrop-blur-sm"
                     >
-                      <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4 group-hover:-translate-x-1 transition-transform duration-200" />
+                      <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-200" />
                       <span>Back to Posts</span>
                     </button>
                     
-                    {selectedPost.featured && (
-                      <div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium">
-                        <Brain className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                        <span>Featured Article</span>
-                      </div>
-                    )}
-                    <span className="bg-blue-600 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium">
-                      {selectedPost.category}
-                    </span>
+                    {/* Badges */}
+                    <div className="flex flex-col space-y-1">
+                      {selectedPost.featured && (
+                        <div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg">
+                          <Brain className="h-3 w-3" />
+                          <span>Featured Article</span>
+                        </div>
+                      )}
+                      <span className="bg-blue-600 text-white px-2 py-1 rounded-full text-xs font-medium shadow-lg w-fit">
+                        {selectedPost.category}
+                      </span>
+                    </div>
                   </div>
                   
-                  {/* Close Button */}
+                  {/* Close Button - Fixed Alignment */}
                   <button
                     onClick={() => setSelectedPost(null)}
-                    className="bg-white/90 dark:bg-gray-900/90 text-gray-900 dark:text-white p-1.5 sm:p-2 rounded-full hover:bg-white dark:hover:bg-gray-900 transition-colors touch-manipulation hover:scale-110"
+                    className="w-10 h-10 bg-white/95 dark:bg-gray-900/95 text-gray-900 dark:text-white rounded-full hover:bg-white dark:hover:bg-gray-900 transition-all duration-300 touch-manipulation hover:scale-110 flex items-center justify-center shadow-lg backdrop-blur-sm"
+                    aria-label="Close modal"
                   >
-                    <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                    <X className="h-5 w-5" />
                   </button>
                 </div>
               </div>
