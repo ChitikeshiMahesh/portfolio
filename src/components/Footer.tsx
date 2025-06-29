@@ -87,20 +87,19 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Section - Fixed Alignment */}
+        {/* Bottom Section - Fixed Copyright Alignment */}
         <div className="border-t border-gray-800 dark:border-gray-700 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            {/* Copyright Text - Fixed Alignment */}
-            <div className="flex items-center justify-center md:justify-start space-x-2 text-gray-300 text-sm order-2 md:order-1">
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            {/* Fixed Copyright Text with Proper Alignment */}
+            <div className="flex items-center justify-center space-x-2 text-gray-300 text-sm sm:text-base">
               <span>© {currentYear} Mahesh. Made with</span>
               <Heart className="h-4 w-4 text-red-500 flex-shrink-0" />
               <span>using React & Tailwind CSS</span>
             </div>
             
-            {/* Back to Top Button - Fixed Alignment */}
             <button
               onClick={scrollToTop}
-              className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 hover:-translate-y-1 touch-manipulation order-1 md:order-2"
+              className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-all duration-300 hover:scale-105 hover:-translate-y-1 touch-manipulation"
             >
               <ArrowUp className="h-4 w-4" />
               <span>Back to Top</span>
