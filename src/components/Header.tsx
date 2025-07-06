@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Code, User, Briefcase, Award, Mail, BookOpen, Trophy } from 'lucide-react';
+import { Menu, X, Code } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [menuState, setMenuState] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -19,84 +21,107 @@ const Header = () => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
-    setIsMenuOpen(false);
+    setMenuState(false);
   };
 
-  const navItems = [
-    { name: 'Home', id: 'home', icon: Code },
-    { name: 'About', id: 'about', icon: User },
-    { name: 'Projects', id: 'projects', icon: Briefcase },
-    { name: 'Skills', id: 'skills', icon: Award },
-    { name: 'Achievements', id: 'certifications', icon: Trophy },
-    { name: 'Blog', id: 'blog', icon: BookOpen },
-    { name: 'Contact', id: 'contact', icon: Mail },
+  const menuItems = [
+    { name: 'Home', id: 'home' },
+    { name: 'About', id: 'about' },
+    { name: 'Projects', id: 'projects' },
+    { name: 'Skills', id: 'skills' },
+    { name: 'Achievements', id: 'certifications' },
+    { name: 'Blog', id: 'blog' },
+    { name: 'Contact', id: 'contact' },
   ];
 
   return (
-    <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-      scrolled 
-        ? 'bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm shadow-lg border-b border-gray-200 dark:border-gray-700' 
-        : 'bg-transparent'
-    }`}>
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
-        <div className="flex justify-between items-center py-3 md:py-4">
-          {/* Logo Section */}
-          <div className="flex items-center space-x-2">
-            <Code className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-indigo-600 dark:text-indigo-400" />
-            <span className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white">Mahesh</span>
-          </div>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 xl:space-x-8">
-            {navItems.map((item) => (
+    <header>
+      <nav
+        data-state={menuState && 'active'}
+        className="fixed z-20 w-full px-2 group">
+        <div className={cn('mx-auto mt-2 max-w-6xl px-6 transition-all duration-300 lg:px-12', isScrolled && 'bg-background/50 max-w-4xl rounded-2xl border backdrop-blur-lg lg:px-5')}>
+          <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
+            <div className="flex w-full justify-between lg:w-auto">
               <button
-                key={item.id}
-                onClick={() => scrollToSection(item.id)}
-                className="flex items-center space-x-1 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200 text-sm lg:text-base px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
-              >
-                <item.icon className="h-4 w-4" />
-                <span>{item.name}</span>
+                onClick={() => scrollToSection('home')}
+                aria-label="home"
+                className="flex items-center space-x-2 cursor-pointer">
+                <Logo />
               </button>
-            ))}
-            <ThemeToggle />
-          </nav>
 
-          {/* Mobile Menu Button and Theme Toggle - Fixed Alignment */}
-          <div className="md:hidden flex items-center justify-center space-x-2">
-            <ThemeToggle />
-            <button
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors touch-manipulation flex items-center justify-center"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              aria-label="Toggle mobile menu"
-            >
-              {isMenuOpen ? (
-                <X className="h-5 w-5 sm:h-6 sm:w-6 text-gray-900 dark:text-white" />
-              ) : (
-                <Menu className="h-5 w-5 sm:h-6 sm:w-6 text-gray-900 dark:text-white" />
-              )}
-            </button>
+              <button
+                onClick={() => setMenuState(!menuState)}
+                aria-label={menuState == true ? 'Close Menu' : 'Open Menu'}
+                className="relative z-20 -m-2.5 -mr-4 block cursor-pointer p-2.5 lg:hidden">
+                <Menu className="in-data-[state=active]:rotate-180 group-data-[state=active]:scale-0 group-data-[state=active]:opacity-0 m-auto size-6 duration-200" />
+                <X className="group-data-[state=active]:rotate-0 group-data-[state=active]:scale-100 group-data-[state=active]:opacity-100 absolute inset-0 m-auto size-6 -rotate-180 scale-0 opacity-0 duration-200" />
+              </button>
+            </div>
+
+            <div className="absolute inset-0 m-auto hidden size-fit lg:block">
+              <ul className="flex gap-8 text-sm">
+                {menuItems.map((item, index) => (
+                  <li key={index}>
+                    <button
+                      onClick={() => scrollToSection(item.id)}
+                      className="text-muted-foreground hover:text-accent-foreground block duration-150 cursor-pointer">
+                      <span>{item.name}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-background group-data-[state=active]:block lg:group-data-[state=active]:flex mb-6 hidden w-full flex-wrap items-center justify-end space-y-8 rounded-3xl border p-6 shadow-2xl shadow-zinc-300/20 md:flex-nowrap lg:m-0 lg:flex lg:w-fit lg:gap-6 lg:space-y-0 lg:border-transparent lg:bg-transparent lg:p-0 lg:shadow-none dark:shadow-none dark:lg:bg-transparent">
+              <div className="lg:hidden">
+                <ul className="space-y-6 text-base">
+                  {menuItems.map((item, index) => (
+                    <li key={index}>
+                      <button
+                        onClick={() => scrollToSection(item.id)}
+                        className="text-muted-foreground hover:text-accent-foreground block duration-150 cursor-pointer">
+                        <span>{item.name}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
+                <ThemeToggle />
+                <Button
+                  onClick={() => scrollToSection('contact')}
+                  variant="outline"
+                  size="sm"
+                  className={cn(isScrolled && 'lg:hidden')}>
+                  <span>Contact</span>
+                </Button>
+                <Button
+                  onClick={() => scrollToSection('projects')}
+                  size="sm"
+                  className={cn(isScrolled && 'lg:hidden')}>
+                  <span>View Work</span>
+                </Button>
+                <Button
+                  onClick={() => scrollToSection('projects')}
+                  size="sm"
+                  className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
+                  <span>Get Started</span>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-3 rounded-b-lg shadow-lg mx-1">
-            <nav className="flex flex-col space-y-1">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className="flex items-center space-x-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200 text-left touch-manipulation rounded-lg mx-2"
-                >
-                  <item.icon className="h-5 w-5" />
-                  <span className="font-medium">{item.name}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        )}
-      </div>
+      </nav>
     </header>
+  );
+};
+
+const Logo = ({ className }: { className?: string }) => {
+  return (
+    <div className="flex items-center space-x-2">
+      <Code className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-indigo-600 dark:text-indigo-400" />
+      <span className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white">Mahesh</span>
+    </div>
   );
 };
 
