@@ -1,8 +1,8 @@
 import React from 'react';
-import { HeroSection } from '@/components/ui/hero-section';
+import Hero from '@/components/ui/hero-section';
 
 const AlternativeHero = () => {
-  return <HeroSection />;
+  return <Hero />;
 };
 
 export default AlternativeHero;
