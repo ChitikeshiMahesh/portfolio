@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowDown, Download, Github, Linkedin, Mail, Eye } from 'lucide-react';
-import ResumeViewer from '../ResumeViewer';
+import ResumeViewer from './ResumeViewer';
 
 const Hero = () => {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
