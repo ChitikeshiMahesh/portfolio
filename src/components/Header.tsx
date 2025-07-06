@@ -105,7 +105,7 @@ const Header = () => {
                   onClick={() => scrollToSection('projects')}
                   size="sm"
                   className={cn(isScrolled ? 'lg:inline-flex' : 'hidden')}>
-                  <span>Get Started</span>
+                  <span>Join us</span>
                 </Button>
               </div>
             </div>
