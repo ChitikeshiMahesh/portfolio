@@ -1,21 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, CornerDownLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import {
-  ChatBubble,
-  ChatBubbleAvatar,
-  ChatBubbleMessage,
-} from '@/components/ui/chat-bubble';
-import { ChatInput } from '@/components/ui/chat-input';
-import {
-  ExpandableChat,
-  ExpandableChatHeader,
-  ExpandableChatBody,
-  ExpandableChatFooter,
-} from '@/components/ui/expandable-chat';
-import { ChatMessageList } from '@/components/ui/chat-message-list';
+import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 
 const Chatbot = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -26,6 +13,15 @@ const Chatbot = () => {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const faqSuggestions = [
     "Tell me about CampusConnect",
@@ -56,37 +52,37 @@ const Chatbot = () => {
 
     // About Mahesh
     if (message.includes("who is mahesh") || message.includes("about mahesh")) {
-      return "Mr. Chitikeshi Mahesh is a skilled developer passionate about AI, machine learning, and modern web technologies. He is the founder of CampusConnect, an innovative student life platform. Would you like to explore his projects or skill set?";
+      return "Mr. Chitikeshi Mahesh is a skilled developer passionate about AI, machine learning, and modern web technologies. He is the founder of <strong>CampusConnect</strong>, an innovative student life platform. Would you like to explore his projects or skill set?";
     }
 
     // CampusConnect specific
     if (message.includes("campusconnect") || message.includes("campus connect")) {
-      return "CampusConnect is Mahesh's flagship startup project! It's a smart solution to simplify everyday student life on campus. The platform allows students to place food and snack orders, request Xerox services, and access other campus essentials - all in one place, eliminating queues and manual requests. It features Firebase authentication, role-based access for students and admins, and is currently in development with a planned release in 2026. Demo coming soon! 🚀 Want to join the team? Visit: https://mahesh06.me/form/";
+      return "CampusConnect is Mahesh's flagship startup project! It's a smart solution to simplify everyday student life on campus. The platform allows students to place food and snack orders, request Xerox services, and access other campus essentials - all in one place, eliminating queues and manual requests. It features Firebase authentication, role-based access for students and admins, and is currently in development with a planned release in 2026. Demo coming soon! <br><br>🚀 <strong>Want to join the team?</strong> Visit: <a href='https://mahesh06.me/form/' target='_blank' style='color: #4f46e5; text-decoration: underline;'>https://mahesh06.me/form/</a>";
     }
 
     // Join/Collaboration
     if (message.includes("join") || message.includes("collaborate") || message.includes("team") || message.includes("work together")) {
-      return `Exciting! Mahesh is always looking for passionate individuals to join CampusConnect. Whether you're a developer, designer, or innovator, there's a place for you! 🎯 Join CampusConnect: https://mahesh06.me/form/ Fill out the form and Mahesh will get back to you about collaboration opportunities!`;
+      return `Exciting! Mahesh is always looking for passionate individuals to join CampusConnect. Whether you're a developer, designer, or innovator, there's a place for you! <br><br>🎯 <strong>Join CampusConnect:</strong> <a href='https://mahesh06.me/form/' target='_blank' style='color: #4f46e5; text-decoration: underline;'>https://mahesh06.me/form/</a><br><br>Fill out the form and Mahesh will get back to you about collaboration opportunities!`;
     }
 
     // Startup/Business
     if (message.includes("startup") || message.includes("business") || message.includes("entrepreneur")) {
-      return "Yes! Mahesh is working on CampusConnect, an innovative startup that aims to revolutionize student life on campus. The platform is currently in development with a planned release in 2026. It's designed to eliminate traditional queues and manual processes by providing a centralized digital solution for all campus services. Interested in joining? Check out: https://mahesh06.me/form/";
+      return "Yes! Mahesh is working on CampusConnect, an innovative startup that aims to revolutionize student life on campus. The platform is currently in development with a planned release in 2026. It's designed to eliminate traditional queues and manual processes by providing a centralized digital solution for all campus services. <br><br>Interested in joining? Check out: <a href='https://mahesh06.me/form/' target='_blank' style='color: #4f46e5; text-decoration: underline;'>https://mahesh06.me/form/</a>";
     }
 
     // Hiring
     if (message.includes("hire")) {
-      return `That's wonderful! You can express your interest by filling out this short form: https://mahesh06.me/form/. Mr. Mahesh will get back to you promptly.`;
+      return `That's wonderful! You can express your interest by filling out this short form: <a href="https://mahesh06.me/form/" target="_blank" style="color: #4f46e5; text-decoration: underline;">https://mahesh06.me/form/</a>. Mr. Mahesh will get back to you promptly.`;
     }
 
     // Learning/Mentorship
     if (message.includes("learn from") || message.includes("learn")) {
-      return `Mr. Mahesh regularly shares insights through projects and open-source code. Feel free to explore his GitHub or reach out for mentorship via this form: https://mahesh06.me/form/.`;
+      return `Mr. Mahesh regularly shares insights through projects and open-source code. Feel free to explore his GitHub or reach out for mentorship via this form: <a href="https://mahesh06.me/form/" target="_blank" style="color: #4f46e5; text-decoration: underline;">https://mahesh06.me/form/</a>.`;
     }
 
     // Projects
     if (message.includes('project') || message.includes('work')) {
-      return "Mahesh has worked on several exciting projects! His flagship project is CampusConnect - a startup solution for campus life management. Other notable projects include his Personal Portfolio Website, DSA Resource Platform, and Digital Diary App. Each showcases different aspects of full-stack development and problem-solving. Would you like to know more about any specific project?";
+      return "Mahesh has worked on several exciting projects! His flagship project is <strong>CampusConnect</strong> - a startup solution for campus life management. Other notable projects include his Personal Portfolio Website, DSA Resource Platform, and Digital Diary App. Each showcases different aspects of full-stack development and problem-solving. Would you like to know more about any specific project?";
     }
     
     // Skills
@@ -96,7 +92,7 @@ const Chatbot = () => {
     
     // Contact
     if (message.includes('contact') || message.includes('reach') || message.includes('email')) {
-      return `You can reach Mahesh through several channels: Email at chitikeshimahesh6@gmail.com, phone at +91-7013295712, or connect with him on LinkedIn and GitHub. He's always open to discussing new opportunities or collaborations!`;
+      return `You can reach Mahesh through several channels: Email at <a href="mailto:chitikeshimahesh6@gmail.com" style="color: #4f46e5; text-decoration: underline;">chitikeshimahesh6@gmail.com</a>, phone at <a href="tel:+917013295712" style="color: #4f46e5; text-decoration: underline;">+91-7013295712</a>, or connect with him on <a href="https://www.linkedin.com/in/chitikeshimahesh/" target="_blank" style="color: #4f46e5; text-decoration: underline;">LinkedIn</a> and <a href="https://github.com/Mahesh-ch06" target="_blank" style="color: #4f46e5; text-decoration: underline;">GitHub</a>. He's always open to discussing new opportunities or collaborations!`;
     }
     
     // Education
@@ -128,8 +124,7 @@ const Chatbot = () => {
     return "That's an interesting question! While I can provide information about Mahesh's projects, skills, education, and experience, I might not have specific details about that topic. You can always contact Mahesh directly for more detailed discussions. Is there anything else about his background or work you'd like to know?";
   };
 
-  const handleSendMessage = (e) => {
-    e.preventDefault();
+  const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
 
     const userMessage = {
@@ -165,95 +160,133 @@ const Chatbot = () => {
   };
 
   return (
-    <ExpandableChat
-      size="lg"
-      position="bottom-right"
-      icon={<Bot className="h-6 w-6" />}
-    >
-      <ExpandableChatHeader className="flex-col text-center justify-center bg-gradient-to-r from-indigo-600 to-purple-600 text-white">
-        <h1 className="text-xl font-semibold">Mahesh's AI Assistant ✨</h1>
-        <p className="text-sm text-indigo-100">
-          Ask me anything about Mahesh's work and projects
-        </p>
-      </ExpandableChatHeader>
+    <>
+      {/* Chatbot Toggle Button */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 p-3 md:p-4 rounded-full shadow-lg transition-all duration-300 touch-manipulation ${
+          isOpen 
+            ? 'bg-red-500 hover:bg-red-600' 
+            : 'bg-indigo-600 hover:bg-indigo-700'
+        } text-white hover:shadow-xl transform hover:scale-105`}
+      >
+        {isOpen ? <X className="h-5 w-5 md:h-6 md:w-6" /> : <MessageCircle className="h-5 w-5 md:h-6 md:w-6" />}
+      </button>
 
-      <ExpandableChatBody>
-        <ChatMessageList>
-          {messages.map((message) => (
-            <ChatBubble
-              key={message.id}
-              variant={message.sender === 'user' ? 'sent' : 'received'}
-            >
-              <ChatBubbleAvatar
-                className="h-8 w-8 shrink-0"
-                fallback={message.sender === 'user' ? 'U' : 'AI'}
-              />
-              <div className="flex flex-col">
-                <ChatBubbleMessage
-                  variant={message.sender === 'user' ? 'sent' : 'received'}
-                >
-                  {message.text}
-                </ChatBubbleMessage>
-                <p className={`text-xs mt-1 ${
-                  message.sender === 'user' ? 'text-right text-indigo-200' : 'text-gray-500 dark:text-gray-400'
-                }`}>
-                  {formatTime(message.timestamp)}
-                </p>
+      {/* Chatbot Window */}
+      {isOpen && (
+        <div className="fixed bottom-16 right-4 md:bottom-24 md:right-6 z-50 w-[calc(100vw-2rem)] max-w-sm md:w-80 bg-white dark:bg-gray-900 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col h-[70vh] md:h-96">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-3 flex-shrink-0">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                <Bot className="h-4 w-4 md:h-5 md:w-5" />
               </div>
-            </ChatBubble>
-          ))}
-
-          {isTyping && (
-            <ChatBubble variant="received">
-              <ChatBubbleAvatar
-                className="h-8 w-8 shrink-0"
-                fallback="AI"
-              />
-              <ChatBubbleMessage isLoading />
-            </ChatBubble>
-          )}
-        </ChatMessageList>
-
-        {/* FAQ Suggestions */}
-        {messages.length === 1 && (
-          <div className="px-4 pb-4">
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Quick questions:</p>
-            <div className="grid grid-cols-1 gap-2">
-              {faqSuggestions.map((suggestion, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSuggestionClick(suggestion)}
-                  className="text-left text-xs p-2 bg-gray-100 dark:bg-gray-800 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 border border-gray-200 dark:border-gray-700 touch-manipulation"
-                >
-                  {suggestion}
-                </button>
-              ))}
+              <div>
+                <h3 className="font-semibold text-sm">Mahesh's AI Assistant</h3>
+                <p className="text-xs text-indigo-100">Ask me anything about Mahesh!</p>
+              </div>
             </div>
           </div>
-        )}
-      </ExpandableChatBody>
 
-      <ExpandableChatFooter>
-        <form
-          onSubmit={handleSendMessage}
-          className="relative rounded-lg border bg-background focus-within:ring-1 focus-within:ring-ring p-1"
-        >
-          <ChatInput
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Type your message..."
-            className="min-h-12 resize-none rounded-lg bg-background border-0 p-3 shadow-none focus-visible:ring-0"
-            style={{ fontSize: '16px' }} // Prevents zoom on iOS
-          />
-          <div className="flex items-center p-3 pt-0 justify-end">
-            <Button type="submit" size="sm" className="ml-auto gap-1.5" disabled={!inputMessage.trim()}>
-              Send Message
-              <CornerDownLeft className="size-3.5" />
-            </Button>
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50 dark:bg-gray-800 min-h-0">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div className={`flex space-x-2 max-w-[85%] ${
+                  message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : 'flex-row'
+                }`}>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                    message.sender === 'user' 
+                      ? 'bg-indigo-600 text-white' 
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                  }`}>
+                    {message.sender === 'user' ? (
+                      <User className="h-3 w-3" />
+                    ) : (
+                      <Bot className="h-3 w-3" />
+                    )}
+                  </div>
+                  <div className={`rounded-lg p-2 ${
+                    message.sender === 'user'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700'
+                  }`}>
+                    <div className="text-xs leading-relaxed" dangerouslySetInnerHTML={{ __html: message.text }} />
+                    <p className={`text-xs mt-1 ${
+                      message.sender === 'user' ? 'text-indigo-200' : 'text-gray-500 dark:text-gray-400'
+                    }`}>
+                      {formatTime(message.timestamp)}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+            
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="flex space-x-2 max-w-[85%]">
+                  <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center">
+                    <Bot className="h-3 w-3" />
+                  </div>
+                  <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-2">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
-        </form>
-      </ExpandableChatFooter>
-    </ExpandableChat>
+
+          {/* FAQ Suggestions */}
+          {messages.length === 1 && (
+            <div className="px-3 pb-2 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
+              <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">Quick questions:</p>
+              <div className="grid grid-cols-1 gap-1">
+                {faqSuggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                    className="text-left text-xs p-2 bg-white dark:bg-gray-900 hover:bg-indigo-50 dark:hover:bg-gray-700 rounded-lg transition-colors text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 border border-gray-200 dark:border-gray-700 touch-manipulation"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Input */}
+          <div className="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-900 flex-shrink-0">
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder="Type your message..."
+                className="flex-1 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                style={{ fontSize: '16px' }} // Prevents zoom on iOS
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputMessage.trim()}
+                className="p-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors touch-manipulation"
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
