@@ -45,7 +45,13 @@ const Chatbot = () => {
     const savedBadges = localStorage.getItem('chatbot-badges');
     
     if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
+      const parsedMessages = JSON.parse(savedMessages);
+      // Convert timestamp strings back to Date objects
+      const messagesWithDateObjects = parsedMessages.map(message => ({
+        ...message,
+        timestamp: new Date(message.timestamp)
+      }));
+      setMessages(messagesWithDateObjects);
     } else {
       // Initial welcome message
       const welcomeMessage = {
@@ -72,7 +78,13 @@ const Chatbot = () => {
     }
     
     if (savedBadges) {
-      setBadges(JSON.parse(savedBadges));
+      const parsedBadges = JSON.parse(savedBadges);
+      // Convert earned timestamp strings back to Date objects
+      const badgesWithDateObjects = parsedBadges.map(badge => ({
+        ...badge,
+        earned: new Date(badge.earned)
+      }));
+      setBadges(badgesWithDateObjects);
     }
 
     // Initialize speech recognition
