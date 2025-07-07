@@ -21,13 +21,14 @@ const Chatbot = () => {
   const [compactMode, setCompactMode] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [isListening, setIsListening] = useState(false);
-  const [chatTheme, setChatTheme] = useState('blue');
+  const [chatTheme, setChatTheme] = useState('gradient');
   const [inputHistory, setInputHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState([]);
   const [showFeedback, setShowFeedback] = useState(false);
   const [badges, setBadges] = useState([]);
   const [isAtBottom, setIsAtBottom] = useState(true);
+  const [hasOpenedBefore, setHasOpenedBefore] = useState(false);
   
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -43,6 +44,11 @@ const Chatbot = () => {
     const savedUserName = localStorage.getItem('chatbot-username');
     const savedSettings = localStorage.getItem('chatbot-settings');
     const savedBadges = localStorage.getItem('chatbot-badges');
+    const hasOpened = localStorage.getItem('chatbot-opened-before');
+    
+    if (hasOpened) {
+      setHasOpenedBefore(true);
+    }
     
     if (savedMessages) {
       const parsedMessages = JSON.parse(savedMessages);
@@ -74,7 +80,7 @@ const Chatbot = () => {
       setFontSize(settings.fontSize || 'medium');
       setCompactMode(settings.compactMode || false);
       setSoundEnabled(settings.soundEnabled !== false);
-      setChatTheme(settings.chatTheme || 'blue');
+      setChatTheme(settings.chatTheme || 'gradient');
     }
     
     if (savedBadges) {
@@ -110,6 +116,15 @@ const Chatbot = () => {
       };
     }
   }, []);
+
+  // Handle opening chatbot
+  const handleOpenChat = () => {
+    setIsOpen(true);
+    if (!hasOpenedBefore) {
+      localStorage.setItem('chatbot-opened-before', 'true');
+      setHasOpenedBefore(true);
+    }
+  };
 
   // Save data when changed
   useEffect(() => {
@@ -178,12 +193,32 @@ const Chatbot = () => {
     }
   };
 
-  // Theme configurations
+  // Theme configurations with professional gradient
   const themes = {
-    blue: { primary: 'bg-blue-600', secondary: 'bg-blue-50 dark:bg-blue-900/20', accent: 'text-blue-600' },
-    purple: { primary: 'bg-purple-600', secondary: 'bg-purple-50 dark:bg-purple-900/20', accent: 'text-purple-600' },
-    green: { primary: 'bg-green-600', secondary: 'bg-green-50 dark:bg-green-900/20', accent: 'text-green-600' },
-    gradient: { primary: 'bg-gradient-to-r from-indigo-600 to-purple-600', secondary: 'bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20', accent: 'text-indigo-600' }
+    blue: { 
+      primary: 'bg-blue-600', 
+      secondary: 'bg-blue-50 dark:bg-blue-900/20', 
+      accent: 'text-blue-600',
+      gradient: 'bg-gradient-to-r from-blue-600 to-blue-700'
+    },
+    purple: { 
+      primary: 'bg-purple-600', 
+      secondary: 'bg-purple-50 dark:bg-purple-900/20', 
+      accent: 'text-purple-600',
+      gradient: 'bg-gradient-to-r from-purple-600 to-purple-700'
+    },
+    green: { 
+      primary: 'bg-green-600', 
+      secondary: 'bg-green-50 dark:bg-green-900/20', 
+      accent: 'text-green-600',
+      gradient: 'bg-gradient-to-r from-green-600 to-green-700'
+    },
+    gradient: { 
+      primary: 'bg-gradient-to-r from-indigo-600 to-purple-600', 
+      secondary: 'bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20', 
+      accent: 'text-indigo-600',
+      gradient: 'bg-gradient-to-r from-indigo-600 to-purple-600'
+    }
   };
 
   const currentTheme = themes[chatTheme];
@@ -196,17 +231,13 @@ const Chatbot = () => {
   };
 
   const getWelcomeMessage = () => {
-    const greetings = [
-      "नमस्ते! Hello! I'm Mahesh's AI assistant.",
-      "¡Hola! Hello! I'm here to help you learn about Mahesh.",
-      "Hello! I'm Mahesh's intelligent assistant. How can I help you today?"
-    ];
-    
-    if (userName) {
-      return `Welcome back, ${userName}! ${personalities[botPersonality].greeting.replace("Hello!", "Great to see you again!")}`;
+    if (hasOpenedBefore && userName) {
+      return `Welcome back, ${userName}! What would you like to explore today?`;
+    } else if (hasOpenedBefore) {
+      return "Hi! How can I assist you with Mahesh's projects today?";
+    } else {
+      return "Hello! I'm Mahesh's AI assistant. I can help you learn more about his projects, skills, or experience. How can I assist you today?";
     }
-    
-    return greetings[Math.floor(Math.random() * greetings.length)];
   };
 
   // Enhanced response system with context awareness
@@ -241,14 +272,14 @@ const Chatbot = () => {
     // Greetings with personality
     if (/^(hi|hello|hey|hii|namaste)\b/.test(message)) {
       const personalizedGreeting = userName ? `Hello again, ${userName}! ` : "Hello! ";
-      response = personalizedGreeting + personalities[botPersonality].greeting;
+      response = personalizedGreeting + "I'm Mahesh's AI assistant. How can I help you learn about his work today?";
       newSuggestions = ['Tell me about CampusConnect', 'What are your skills?', 'Show me projects', 'Contact info'];
       emoji = '👋';
     }
 
     // CampusConnect with enhanced details
     else if (message.includes("campusconnect") || message.includes("campus connect")) {
-      response = "CampusConnect is Mahesh's flagship startup project! 🚀 It's a smart solution to simplify everyday student life on campus. The platform allows students to place food and snack orders, request Xerox services, and access other campus essentials - all in one place, eliminating queues and manual requests. It features Firebase authentication, role-based access for students and admins, and is currently in development with a planned release in 2026. Demo coming soon! <br><br>🌟 <strong>Want to join the team?</strong> Visit: <a href='https://mahesh06.me/form/' target='_blank' style='color: #4f46e5; text-decoration: underline;'>https://mahesh06.me/form/</a>";
+      response = "CampusConnect is Mahesh's flagship startup project! 🚀 It's a smart solution to simplify everyday student life on campus. The platform allows students to place food and snack orders, request Xerox services, and access other campus essentials - all in one place, eliminating queues and manual requests. It features Firebase authentication, role-based access for students and admins, and is currently in development with a planned release in 2026. Demo coming soon! <br><br>🌟 <strong>Want to join the team?</strong> Visit: <a href='https://mahesh06.me/form/' target='_blank' style='color: #6C63FF; text-decoration: underline;'>https://mahesh06.me/form/</a>";
       newSuggestions = ['How to join CampusConnect?', 'When will it launch?', 'What technologies are used?', 'Show other projects'];
       emoji = '🚀';
       checkAndAwardBadge('project_explorer');
@@ -272,7 +303,7 @@ const Chatbot = () => {
 
     // Contact with multiple options
     else if (message.includes('contact') || message.includes('reach') || message.includes('email')) {
-      response = `You can reach Mahesh through several channels:<br><br>📧 <strong>Email:</strong> <a href="mailto:chitikeshimahesh6@gmail.com" style="color: #4f46e5; text-decoration: underline;">chitikeshimahesh6@gmail.com</a><br>📱 <strong>Phone:</strong> <a href="tel:+917013295712" style="color: #4f46e5; text-decoration: underline;">+91-7013295712</a><br>💼 <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/chitikeshimahesh/" target="_blank" style="color: #4f46e5; text-decoration: underline;">Connect on LinkedIn</a><br>💻 <strong>GitHub:</strong> <a href="https://github.com/Mahesh-ch06" target="_blank" style="color: #4f46e5; text-decoration: underline;">View GitHub Profile</a><br><br>He's always open to discussing new opportunities or collaborations!`;
+      response = `You can reach Mahesh through several channels:<br><br>📧 <strong>Email:</strong> <a href="mailto:chitikeshimahesh6@gmail.com" style="color: #6C63FF; text-decoration: underline;">chitikeshimahesh6@gmail.com</a><br>📱 <strong>Phone:</strong> <a href="tel:+917013295712" style="color: #6C63FF; text-decoration: underline;">+91-7013295712</a><br>💼 <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/chitikeshimahesh/" target="_blank" style="color: #6C63FF; text-decoration: underline;">Connect on LinkedIn</a><br>💻 <strong>GitHub:</strong> <a href="https://github.com/Mahesh-ch06" target="_blank" style="color: #6C63FF; text-decoration: underline;">View GitHub Profile</a><br><br>He's always open to discussing new opportunities or collaborations!`;
       newSuggestions = ['Schedule a meeting', 'Download resume', 'Join CampusConnect', 'View portfolio'];
       emoji = '📞';
     }
@@ -294,19 +325,14 @@ const Chatbot = () => {
 
     // Join/Collaboration
     else if (message.includes("join") || message.includes("collaborate") || message.includes("team") || message.includes("work together")) {
-      response = `Exciting! Mahesh is always looking for passionate individuals to join CampusConnect. Whether you're a developer, designer, or innovator, there's a place for you! <br><br>🎯 <strong>Join CampusConnect:</strong> <a href='https://mahesh06.me/form/' target='_blank' style='color: #4f46e5; text-decoration: underline;'>https://mahesh06.me/form/</a><br><br>Fill out the form and Mahesh will get back to you about collaboration opportunities!`;
+      response = `Exciting! Mahesh is always looking for passionate individuals to join CampusConnect. Whether you're a developer, designer, or innovator, there's a place for you! <br><br>🎯 <strong>Join CampusConnect:</strong> <a href='https://mahesh06.me/form/' target='_blank' style='color: #6C63FF; text-decoration: underline;'>https://mahesh06.me/form/</a><br><br>Fill out the form and Mahesh will get back to you about collaboration opportunities!`;
       newSuggestions = ['Tell me about CampusConnect', 'What skills are needed?', 'Contact Mahesh directly', 'View other projects'];
       emoji = '🤝';
     }
 
     // Thanks with personality
     else if (message.includes('thank') || message.includes('thanks')) {
-      const thankResponses = {
-        professional: "You're very welcome! I'm pleased to assist you.",
-        casual: "No problem at all! Happy to help! 😊",
-        technical: "Acknowledgment received. System ready for additional queries."
-      };
-      response = thankResponses[botPersonality] + " If you have any other questions about Mahesh's work, projects, or experience, feel free to ask!";
+      response = "You're very welcome! I'm happy to help. If you have any other questions about Mahesh's work, projects, or experience, feel free to ask!";
       newSuggestions = ['Ask another question', 'Download resume', 'Contact Mahesh', 'Explore more projects'];
       emoji = '😊';
     }
@@ -334,12 +360,7 @@ const Chatbot = () => {
 
     // Default response with suggestions
     else {
-      const defaultResponses = {
-        professional: "I specialize in providing information about Mahesh's professional background, projects, and expertise. Could you please clarify what you'd like to know?",
-        casual: "I'm here to chat about Mahesh's awesome work! What would you like to explore?",
-        technical: "My knowledge base contains comprehensive data about Mahesh's technical projects and capabilities. Please specify your query parameters."
-      };
-      response = defaultResponses[botPersonality];
+      response = "I specialize in providing information about Mahesh's professional background, projects, and expertise. What would you like to learn about today?";
       newSuggestions = ['Show me projects', 'Tell me about skills', 'Contact information', 'Achievements & awards'];
       emoji = '🤖';
     }
@@ -527,40 +548,53 @@ const Chatbot = () => {
   if (!isOpen) {
     return (
       <button
-        onClick={() => setIsOpen(true)}
-        className={`fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 p-3 md:p-4 rounded-full shadow-lg transition-all duration-300 touch-manipulation ${currentTheme.primary} text-white hover:shadow-xl transform hover:scale-105 group`}
+        onClick={handleOpenChat}
+        className={`fixed bottom-6 right-6 z-40 p-4 rounded-full shadow-2xl transition-all duration-500 touch-manipulation ${currentTheme.gradient} text-white hover:shadow-xl transform hover:scale-110 group animate-pulse-glow`}
+        style={{
+          marginBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
+          marginRight: 'max(1.5rem, env(safe-area-inset-right))'
+        }}
         aria-label="Open chat assistant"
       >
-        <MessageCircle className="h-5 w-5 md:h-6 md:w-6 group-hover:rotate-12 transition-transform duration-300" />
+        <MessageCircle className="h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />
         {badges.length > 0 && (
-          <div className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-pulse">
+          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center animate-bounce font-bold">
             {badges.length}
           </div>
         )}
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
       </button>
     );
   }
 
   return (
-    <div className={`fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 ${isMinimized ? 'w-64' : 'w-[calc(100vw-2rem)] max-w-sm md:w-80'} ${currentTheme.secondary} rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col ${isMinimized ? 'h-12' : 'h-[70vh] md:h-96'} transition-all duration-300`}>
+    <div 
+      className={`fixed bottom-6 right-6 z-40 ${isMinimized ? 'w-72' : 'w-[calc(100vw-3rem)] max-w-sm md:w-80'} chatbot-container rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex flex-col ${isMinimized ? 'h-14' : 'h-[75vh] md:h-[28rem]'} transition-all duration-500 animate-slide-up`}
+      style={{
+        marginBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
+        marginRight: 'max(1.5rem, env(safe-area-inset-right))',
+        fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
+      }}
+    >
       
-      {/* Header */}
-      <div className={`${currentTheme.primary} text-white p-3 flex-shrink-0`}>
-        <div className="flex items-center justify-between">
+      {/* Header with Professional Gradient */}
+      <div className={`${currentTheme.gradient} text-white p-4 flex-shrink-0 relative overflow-hidden`}>
+        <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
+        <div className="relative z-10 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center relative">
-              <Bot className="h-4 w-4 md:h-5 md:w-5" />
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative backdrop-blur-sm border border-white/30">
+              <Bot className="h-5 w-5" />
               {isTyping && (
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse border-2 border-white"></div>
               )}
             </div>
             <div>
               <h3 className="font-semibold text-sm flex items-center">
                 Mahesh's AI Assistant
-                {badges.length > 0 && <Sparkles className="h-3 w-3 ml-1 animate-pulse" />}
+                {badges.length > 0 && <Sparkles className="h-3 w-3 ml-2 animate-pulse" />}
               </h3>
-              <p className="text-xs text-white/80">
-                {isTyping ? 'Typing...' : `${personalities[botPersonality].name} mode`}
+              <p className="text-xs text-white/90">
+                {isTyping ? 'Typing...' : 'Online • Ready to help'}
               </p>
             </div>
           </div>
@@ -568,21 +602,21 @@ const Chatbot = () => {
           <div className="flex items-center space-x-1">
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm"
               title="Settings"
             >
               <Settings className="h-4 w-4" />
             </button>
             <button
               onClick={() => setIsMinimized(!isMinimized)}
-              className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm"
               title={isMinimized ? "Expand" : "Minimize"}
             >
               {isMinimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
             </button>
             <button
               onClick={() => setIsOpen(false)}
-              className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
+              className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm"
               title="Close"
             >
               <X className="h-4 w-4" />
@@ -595,14 +629,14 @@ const Chatbot = () => {
         <>
           {/* Settings Panel */}
           {showSettings && (
-            <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-3 space-y-3">
-              <div className="grid grid-cols-2 gap-2">
+            <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 p-4 space-y-3 settings-slide">
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Personality</label>
+                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 block">Personality</label>
                   <select
                     value={botPersonality}
                     onChange={(e) => setBotPersonality(e.target.value)}
-                    className="w-full text-xs p-1 border rounded dark:bg-gray-700 dark:border-gray-600"
+                    className="w-full text-xs p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
                   >
                     {Object.entries(personalities).map(([key, personality]) => (
                       <option key={key} value={key}>{personality.name}</option>
@@ -610,16 +644,16 @@ const Chatbot = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Theme</label>
+                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 block">Theme</label>
                   <select
                     value={chatTheme}
                     onChange={(e) => setChatTheme(e.target.value)}
-                    className="w-full text-xs p-1 border rounded dark:bg-gray-700 dark:border-gray-600"
+                    className="w-full text-xs p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
                   >
+                    <option value="gradient">🌈 Professional</option>
                     <option value="blue">🔵 Blue</option>
                     <option value="purple">🟣 Purple</option>
                     <option value="green">🟢 Green</option>
-                    <option value="gradient">🌈 Gradient</option>
                   </select>
                 </div>
               </div>
@@ -628,21 +662,21 @@ const Chatbot = () => {
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setFontSize(fontSize === 'small' ? 'medium' : fontSize === 'medium' ? 'large' : 'small')}
-                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 btn-hover-lift"
                     title="Font Size"
                   >
                     <Type className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setCompactMode(!compactMode)}
-                    className={`p-1 rounded ${compactMode ? 'bg-blue-100 dark:bg-blue-900' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                    className={`p-2 rounded-lg transition-all duration-200 btn-hover-lift ${compactMode ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
                     title="Compact Mode"
                   >
                     <Minimize2 className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setSoundEnabled(!soundEnabled)}
-                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 btn-hover-lift"
                     title="Sound"
                   >
                     {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
@@ -652,14 +686,14 @@ const Chatbot = () => {
                 <div className="flex items-center space-x-1">
                   <button
                     onClick={exportChat}
-                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 btn-hover-lift export-glow"
                     title="Export Chat"
                   >
                     <Download className="h-4 w-4" />
                   </button>
                   <button
                     onClick={clearChat}
-                    className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-red-500"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-red-500 transition-all duration-200 btn-hover-lift clear-warning"
                     title="Clear Chat"
                   >
                     <X className="h-4 w-4" />
@@ -671,17 +705,17 @@ const Chatbot = () => {
 
           {/* Badges Display */}
           {badges.length > 0 && (
-            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-b border-gray-200 dark:border-gray-700 p-2">
-              <div className="flex items-center space-x-1 overflow-x-auto">
-                <Trophy className="h-3 w-3 text-yellow-600 flex-shrink-0" />
+            <div className="bg-gradient-to-r from-yellow-50/90 to-orange-50/90 dark:from-yellow-900/20 dark:to-orange-900/20 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 p-3">
+              <div className="flex items-center space-x-2 overflow-x-auto custom-scrollbar">
+                <Trophy className="h-4 w-4 text-yellow-600 flex-shrink-0" />
                 {badges.map((badge, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center space-x-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-full text-xs whitespace-nowrap"
+                    className="inline-flex items-center space-x-1 bg-yellow-100/90 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-full text-xs whitespace-nowrap backdrop-blur-sm border border-yellow-200/50 dark:border-yellow-700/50 badge-notification"
                     title={badge.description}
                   >
                     <span>{badge.icon}</span>
-                    <span>{badge.name}</span>
+                    <span className="font-medium">{badge.name}</span>
                   </span>
                 ))}
               </div>
@@ -692,32 +726,32 @@ const Chatbot = () => {
           <div 
             ref={messagesContainerRef}
             onScroll={handleScroll}
-            className={`flex-1 overflow-y-auto p-3 space-y-3 bg-gray-50 dark:bg-gray-800 min-h-0 ${fontSizes[fontSize]} custom-scrollbar`}
+            className={`flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50 dark:bg-gray-800/50 min-h-0 ${fontSizes[fontSize]} custom-scrollbar backdrop-blur-sm`}
           >
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in`}
+                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} message-animation`}
               >
-                <div className={`flex space-x-2 max-w-[85%] ${
+                <div className={`flex space-x-3 max-w-[85%] ${
                   message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : 'flex-row'
                 }`}>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${
                     message.sender === 'user' 
-                      ? currentTheme.primary + ' text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300'
+                      ? currentTheme.gradient + ' text-white'
+                      : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
                   }`}>
                     {message.sender === 'user' ? (
-                      <User className="h-3 w-3" />
+                      <User className="h-4 w-4" />
                     ) : (
-                      <Bot className="h-3 w-3" />
+                      <Bot className="h-4 w-4" />
                     )}
                   </div>
-                  <div className={`rounded-lg ${compactMode ? 'p-2' : 'p-3'} ${
+                  <div className={`rounded-2xl ${compactMode ? 'p-3' : 'p-4'} shadow-sm hover:shadow-md transition-all duration-300 message-bubble ${
                     message.sender === 'user'
-                      ? currentTheme.primary + ' text-white'
-                      : 'bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 border border-gray-200 dark:border-gray-700'
-                  } shadow-sm hover:shadow-md transition-shadow duration-200`}>
+                      ? currentTheme.gradient + ' text-white'
+                      : 'bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 border border-gray-200/50 dark:border-gray-700/50'
+                  } backdrop-blur-sm`}>
                     <div className="flex items-start space-x-2">
                       {message.emoji && message.sender === 'bot' && (
                         <span className="text-lg flex-shrink-0">{message.emoji}</span>
@@ -725,7 +759,7 @@ const Chatbot = () => {
                       <div className={`${fontSizes[fontSize]} leading-relaxed flex-1`} 
                            dangerouslySetInnerHTML={{ __html: message.text }} />
                     </div>
-                    <p className={`text-xs mt-1 opacity-70 ${
+                    <p className={`text-xs mt-2 opacity-70 ${
                       message.sender === 'user' ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'
                     }`}>
                       {formatTime(message.timestamp)}
@@ -737,16 +771,16 @@ const Chatbot = () => {
             
             {/* Enhanced Typing Indicator */}
             {isTyping && (
-              <div className="flex justify-start animate-fade-in">
-                <div className="flex space-x-2 max-w-[85%]">
-                  <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center">
-                    <Bot className="h-3 w-3" />
+              <div className="flex justify-start message-animation">
+                <div className="flex space-x-3 max-w-[85%]">
+                  <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center border border-gray-200 dark:border-gray-600 shadow-sm">
+                    <Bot className="h-4 w-4" />
                   </div>
-                  <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg p-3 shadow-sm">
-                    <div className="flex space-x-1">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="bg-white/90 dark:bg-gray-800/90 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-4 shadow-sm backdrop-blur-sm">
+                    <div className="enhanced-typing">
+                      <div className="dot"></div>
+                      <div className="dot"></div>
+                      <div className="dot"></div>
                     </div>
                   </div>
                 </div>
@@ -757,13 +791,13 @@ const Chatbot = () => {
 
           {/* Suggestions */}
           {suggestions.length > 0 && !isTyping && (
-            <div className="px-3 pb-2 bg-gray-50 dark:bg-gray-800 flex-shrink-0">
-              <div className="grid grid-cols-1 gap-1">
+            <div className="px-4 pb-3 bg-gray-50/50 dark:bg-gray-800/50 flex-shrink-0 backdrop-blur-sm">
+              <div className="grid grid-cols-1 gap-2">
                 {suggestions.slice(0, 4).map((suggestion, index) => (
                   <button
                     key={index}
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className={`text-left text-xs p-2 bg-white dark:bg-gray-900 hover:${currentTheme.secondary} rounded-lg transition-colors ${currentTheme.accent} border border-gray-200 dark:border-gray-700 touch-manipulation hover:shadow-sm`}
+                    className={`text-left text-xs p-3 bg-white/90 dark:bg-gray-800/90 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-xl transition-all duration-200 ${currentTheme.accent} border border-gray-200/50 dark:border-gray-700/50 touch-manipulation hover:shadow-md suggestion-btn backdrop-blur-sm font-medium`}
                   >
                     {suggestion}
                   </button>
@@ -774,25 +808,25 @@ const Chatbot = () => {
 
           {/* Feedback */}
           {showFeedback && (
-            <div className="bg-blue-50 dark:bg-blue-900/20 border-t border-gray-200 dark:border-gray-700 p-3">
+            <div className="bg-blue-50/90 dark:bg-blue-900/20 border-t border-gray-200/50 dark:border-gray-700/50 p-3 backdrop-blur-sm">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700 dark:text-gray-300">Was this helpful?</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Was this helpful?</span>
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setShowFeedback(false)}
-                    className="p-1 hover:bg-blue-100 dark:hover:bg-blue-800 rounded"
+                    className="p-2 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-lg transition-all duration-200 feedback-btn"
                   >
                     <ThumbsUp className="h-4 w-4 text-green-600" />
                   </button>
                   <button
                     onClick={() => setShowFeedback(false)}
-                    className="p-1 hover:bg-blue-100 dark:hover:bg-blue-800 rounded"
+                    className="p-2 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-lg transition-all duration-200 feedback-btn"
                   >
                     <ThumbsDown className="h-4 w-4 text-red-600" />
                   </button>
                   <button
                     onClick={() => setShowFeedback(false)}
-                    className="p-1 hover:bg-blue-100 dark:hover:bg-blue-800 rounded"
+                    className="p-2 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-lg transition-all duration-200"
                   >
                     <X className="h-3 w-3" />
                   </button>
@@ -802,8 +836,8 @@ const Chatbot = () => {
           )}
 
           {/* Input */}
-          <div className="border-t border-gray-200 dark:border-gray-700 p-3 bg-white dark:bg-gray-900 flex-shrink-0">
-            <div className="flex space-x-2">
+          <div className="border-t border-gray-200/50 dark:border-gray-700/50 p-4 bg-white/90 dark:bg-gray-900/90 flex-shrink-0 backdrop-blur-sm">
+            <div className="flex space-x-3">
               <input
                 ref={inputRef}
                 type="text"
@@ -812,7 +846,7 @@ const Chatbot = () => {
                 onKeyDown={handleKeyDown}
                 placeholder={getPlaceholder()}
                 disabled={isTyping}
-                className={`flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${fontSizes[fontSize]} bg-white dark:bg-gray-800 text-gray-900 dark:text-white disabled:opacity-50`}
+                className={`flex-1 px-4 py-3 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${fontSizes[fontSize]} bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white disabled:opacity-50 transition-all duration-200 backdrop-blur-sm shadow-sm hover:shadow-md`}
                 style={{ fontSize: '16px' }}
               />
               
@@ -820,11 +854,11 @@ const Chatbot = () => {
                 <button
                   onClick={toggleVoiceInput}
                   disabled={isTyping}
-                  className={`p-2 rounded-lg transition-colors touch-manipulation ${
+                  className={`p-3 rounded-xl transition-all duration-200 touch-manipulation shadow-sm hover:shadow-md ${
                     isListening 
-                      ? 'bg-red-600 text-white' 
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
-                  } disabled:opacity-50`}
+                      ? 'bg-red-600 text-white voice-pulse' 
+                      : 'bg-gray-200/90 dark:bg-gray-700/90 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                  } disabled:opacity-50 backdrop-blur-sm`}
                 >
                   {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
                 </button>
@@ -833,14 +867,14 @@ const Chatbot = () => {
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isTyping}
-                className={`p-2 ${currentTheme.primary} text-white rounded-lg hover:opacity-90 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors touch-manipulation`}
+                className={`p-3 ${currentTheme.gradient} text-white rounded-xl hover:opacity-90 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 touch-manipulation shadow-sm hover:shadow-md backdrop-blur-sm`}
               >
                 <Send className="h-4 w-4" />
               </button>
             </div>
             
             {inputHistory.length > 0 && (
-              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 opacity-75">
                 Use ↑↓ arrows to navigate history
               </div>
             )}
