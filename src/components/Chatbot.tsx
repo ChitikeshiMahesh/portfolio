@@ -3,7 +3,7 @@ import {
   MessageCircle, X, Send, Bot, User, Minimize2, Maximize2, Volume2, VolumeX,
   Download, Settings, Palette, Type, Moon, Sun, Mic, MicOff, Copy, 
   ThumbsUp, ThumbsDown, Calendar, QrCode, FileText, ExternalLink,
-  Sparkles, Trophy, Coffee, Zap, Heart, Star
+  Sparkles, Trophy, Coffee, Zap, Heart, Star, MoreHorizontal, Smile
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -29,6 +29,8 @@ const Chatbot = () => {
   const [badges, setBadges] = useState([]);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [hasOpenedBefore, setHasOpenedBefore] = useState(false);
+  const [showQuickActions, setShowQuickActions] = useState(false);
+  const [messageReactions, setMessageReactions] = useState({});
   
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -52,20 +54,19 @@ const Chatbot = () => {
     
     if (savedMessages) {
       const parsedMessages = JSON.parse(savedMessages);
-      // Convert timestamp strings back to Date objects
       const messagesWithDateObjects = parsedMessages.map(message => ({
         ...message,
         timestamp: new Date(message.timestamp)
       }));
       setMessages(messagesWithDateObjects);
     } else {
-      // Initial welcome message
       const welcomeMessage = {
         id: 1,
         text: getWelcomeMessage(),
         sender: 'bot',
         timestamp: new Date(),
-        suggestions: ['Tell me about CampusConnect', 'What are your skills?', 'How can I contact you?', 'Show me your projects']
+        suggestions: ['Tell me about CampusConnect', 'What are your skills?', 'How can I contact you?', 'Show me your projects'],
+        emoji: '👋'
       };
       setMessages([welcomeMessage]);
     }
@@ -85,7 +86,6 @@ const Chatbot = () => {
     
     if (savedBadges) {
       const parsedBadges = JSON.parse(savedBadges);
-      // Convert earned timestamp strings back to Date objects
       const badgesWithDateObjects = parsedBadges.map(badge => ({
         ...badge,
         earned: new Date(badge.earned)
@@ -174,50 +174,31 @@ const Chatbot = () => {
     }
   };
 
-  // Personality configurations
-  const personalities = {
-    professional: {
-      name: '🎩 Professional',
-      greeting: "Hello! I'm Mahesh's professional AI assistant. How may I assist you with his portfolio today?",
-      style: 'formal and informative'
-    },
-    casual: {
-      name: '😎 Casual',
-      greeting: "Hey there! I'm Mahesh's AI buddy. What would you like to know about him?",
-      style: 'friendly and relaxed'
-    },
-    technical: {
-      name: '🤖 Technical',
-      greeting: "Greetings! I'm Mahesh's technical assistant. Ready to dive into his projects and skills?",
-      style: 'detailed and technical'
-    }
-  };
-
-  // Theme configurations with professional gradient
+  // Theme configurations
   const themes = {
     blue: { 
-      primary: 'bg-blue-600', 
+      primary: 'from-blue-500 to-blue-600', 
       secondary: 'bg-blue-50 dark:bg-blue-900/20', 
-      accent: 'text-blue-600',
-      gradient: 'bg-gradient-to-r from-blue-600 to-blue-700'
+      accent: 'text-blue-600 dark:text-blue-400',
+      gradient: 'bg-gradient-to-r from-blue-500 to-blue-600'
     },
     purple: { 
-      primary: 'bg-purple-600', 
+      primary: 'from-purple-500 to-purple-600', 
       secondary: 'bg-purple-50 dark:bg-purple-900/20', 
-      accent: 'text-purple-600',
-      gradient: 'bg-gradient-to-r from-purple-600 to-purple-700'
+      accent: 'text-purple-600 dark:text-purple-400',
+      gradient: 'bg-gradient-to-r from-purple-500 to-purple-600'
     },
     green: { 
-      primary: 'bg-green-600', 
+      primary: 'from-green-500 to-green-600', 
       secondary: 'bg-green-50 dark:bg-green-900/20', 
-      accent: 'text-green-600',
-      gradient: 'bg-gradient-to-r from-green-600 to-green-700'
+      accent: 'text-green-600 dark:text-green-400',
+      gradient: 'bg-gradient-to-r from-green-500 to-green-600'
     },
     gradient: { 
-      primary: 'bg-gradient-to-r from-indigo-600 to-purple-600', 
+      primary: 'from-indigo-500 via-purple-500 to-pink-500', 
       secondary: 'bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20', 
-      accent: 'text-indigo-600',
-      gradient: 'bg-gradient-to-r from-indigo-600 to-purple-600'
+      accent: 'text-indigo-600 dark:text-indigo-400',
+      gradient: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500'
     }
   };
 
@@ -234,9 +215,9 @@ const Chatbot = () => {
     if (hasOpenedBefore && userName) {
       return `Welcome back, ${userName}! What would you like to explore today?`;
     } else if (hasOpenedBefore) {
-      return "Hi! How can I assist you with Mahesh's projects today?";
+      return "Welcome back! What would you like to explore today?";
     } else {
-      return "Hello! I'm Mahesh's AI assistant. I can help you learn more about his projects, skills, or experience. How can I assist you today?";
+      return "Hi! I'm Mahesh's AI assistant. I can help you learn about his projects, skills, and experience. What would you like to know?";
     }
   };
 
@@ -262,105 +243,98 @@ const Chatbot = () => {
         const formattedName = extractedName.charAt(0).toUpperCase() + extractedName.slice(1);
         setUserName(formattedName);
         return {
-          text: `It's great to meet you, ${formattedName}! I'm the AI assistant for Mr. Chitikeshi Mahesh. How may I assist you with his professional portfolio today?`,
+          text: `Nice to meet you, ${formattedName}! I'm here to help you learn about Mahesh's work. What interests you most?`,
           suggestions: ['Show me projects', 'Tell me about skills', 'Contact information'],
           emoji: '👋'
         };
       }
     }
 
-    // Greetings with personality
+    // Greetings
     if (/^(hi|hello|hey|hii|namaste)\b/.test(message)) {
       const personalizedGreeting = userName ? `Hello again, ${userName}! ` : "Hello! ";
-      response = personalizedGreeting + "I'm Mahesh's AI assistant. How can I help you learn about his work today?";
+      response = personalizedGreeting + "How can I help you explore Mahesh's work today?";
       newSuggestions = ['Tell me about CampusConnect', 'What are your skills?', 'Show me projects', 'Contact info'];
       emoji = '👋';
     }
 
-    // CampusConnect with enhanced details
+    // CampusConnect
     else if (message.includes("campusconnect") || message.includes("campus connect")) {
-      response = "CampusConnect is Mahesh's flagship startup project! 🚀 It's a smart solution to simplify everyday student life on campus. The platform allows students to place food and snack orders, request Xerox services, and access other campus essentials - all in one place, eliminating queues and manual requests. It features Firebase authentication, role-based access for students and admins, and is currently in development with a planned release in 2026. Demo coming soon! <br><br>🌟 <strong>Want to join the team?</strong> Visit: <a href='https://mahesh06.me/form/' target='_blank' style='color: #6C63FF; text-decoration: underline;'>https://mahesh06.me/form/</a>";
+      response = "CampusConnect is Mahesh's flagship startup project! 🚀 It's revolutionizing campus life by providing a unified platform for food orders, Xerox services, and other campus essentials. Built with Firebase authentication and role-based access, it's launching in 2026. <br><br>🌟 <strong>Want to join the team?</strong> Visit: <a href='https://mahesh06.me/form/' target='_blank' style='color: #6366f1; text-decoration: underline;'>Join CampusConnect</a>";
       newSuggestions = ['How to join CampusConnect?', 'When will it launch?', 'What technologies are used?', 'Show other projects'];
       emoji = '🚀';
       checkAndAwardBadge('project_explorer');
     }
 
-    // Projects with follow-up guidance
+    // Projects
     else if (message.includes('project') || message.includes('work')) {
-      response = "Mahesh has worked on several exciting projects! His flagship project is <strong>CampusConnect</strong> - a startup solution for campus life management. Other notable projects include his Personal Portfolio Website, DSA Resource Platform, and Digital Diary App. Each showcases different aspects of full-stack development and problem-solving.";
+      response = "Mahesh has built some amazing projects! His flagship is <strong>CampusConnect</strong> - a startup revolutionizing campus life. He's also created a Personal Portfolio, DSA Resource Platform, and Digital Diary App. Each showcases different aspects of full-stack development.";
       newSuggestions = ['Tell me about CampusConnect', 'Show DSA Resource Platform', 'Personal Portfolio details', 'Digital Diary App'];
       emoji = '💻';
       checkAndAwardBadge('project_explorer');
     }
 
-    // Skills with detailed breakdown
+    // Skills
     else if (message.includes('skill') || message.includes('technology') || message.includes('tech')) {
-      response = "Mahesh's technical expertise spans multiple domains: <br><br><strong>Programming:</strong> Java, Python, JavaScript, SQL, HTML/CSS<br><strong>Technologies:</strong> Git, VS Code, Linux, AWS Cloud, Firebase, React.js, Node.js<br><strong>Specializations:</strong> Data Structures & Algorithms, Full-Stack Development, AI/ML, Cloud Computing<br><br>He maintains a strong academic record with a 9.0 GPA in his CSE program.";
+      response = "Mahesh's expertise spans multiple domains: <br><br><strong>💻 Programming:</strong> Java, Python, JavaScript, SQL, HTML/CSS<br><strong>🛠️ Technologies:</strong> Git, VS Code, Linux, AWS Cloud, Firebase, React.js, Node.js<br><strong>🎯 Specializations:</strong> Data Structures & Algorithms, Full-Stack Development, AI/ML, Cloud Computing<br><br>He maintains an impressive 9.0 GPA in his CSE program!";
       newSuggestions = ['Show projects using these skills', 'Tell me about certifications', 'Academic achievements', 'Contact for collaboration'];
       emoji = '🛠️';
       checkAndAwardBadge('skill_seeker');
     }
 
-    // Contact with multiple options
+    // Contact
     else if (message.includes('contact') || message.includes('reach') || message.includes('email')) {
-      response = `You can reach Mahesh through several channels:<br><br>📧 <strong>Email:</strong> <a href="mailto:chitikeshimahesh6@gmail.com" style="color: #6C63FF; text-decoration: underline;">chitikeshimahesh6@gmail.com</a><br>📱 <strong>Phone:</strong> <a href="tel:+917013295712" style="color: #6C63FF; text-decoration: underline;">+91-7013295712</a><br>💼 <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/chitikeshimahesh/" target="_blank" style="color: #6C63FF; text-decoration: underline;">Connect on LinkedIn</a><br>💻 <strong>GitHub:</strong> <a href="https://github.com/Mahesh-ch06" target="_blank" style="color: #6C63FF; text-decoration: underline;">View GitHub Profile</a><br><br>He's always open to discussing new opportunities or collaborations!`;
+      response = `Ready to connect with Mahesh? Here are all the ways:<br><br>📧 <strong>Email:</strong> <a href="mailto:chitikeshimahesh6@gmail.com" style="color: #6366f1; text-decoration: underline;">chitikeshimahesh6@gmail.com</a><br>📱 <strong>Phone:</strong> <a href="tel:+917013295712" style="color: #6366f1; text-decoration: underline;">+91-7013295712</a><br>💼 <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/chitikeshimahesh/" target="_blank" style="color: #6366f1; text-decoration: underline;">Connect on LinkedIn</a><br>💻 <strong>GitHub:</strong> <a href="https://github.com/Mahesh-ch06" target="_blank" style="color: #6366f1; text-decoration: underline;">View GitHub Profile</a><br><br>He's always excited to discuss new opportunities! 🌟`;
       newSuggestions = ['Schedule a meeting', 'Download resume', 'Join CampusConnect', 'View portfolio'];
       emoji = '📞';
     }
 
-    // Education details
+    // Education
     else if (message.includes('education') || message.includes('study') || message.includes('university')) {
-      response = "Mahesh is currently pursuing B.Tech in Computer Science and Engineering with a specialization in AI & ML at SR University, Warangal (2023-2027). He maintains an impressive 9.0 GPA and has completed courses in Data Structures, Algorithms, Operating Systems, Computer Networks, Machine Learning, Python Programming, and Database Systems.";
+      response = "Mahesh is pursuing B.Tech in Computer Science & Engineering (AI & ML) at SR University, Warangal (2023-2027). With an outstanding 9.0 GPA, he's mastered courses in Data Structures, Algorithms, Machine Learning, and more!";
       newSuggestions = ['Show academic achievements', 'Tell me about projects', 'Certifications earned', 'Skills developed'];
       emoji = '🎓';
     }
 
-    // Hackathons and achievements
+    // Achievements
     else if (message.includes('hackathon') || message.includes('achievement') || message.includes('award')) {
-      response = "Mahesh has an impressive track record in competitive programming and hackathons! 🏆 He participated in the Anveshan International Hackathon 2025 at Chitkara University, Punjab, and secured 2nd place in the Anveshan Hackathon (Zonal) 2024 at M. S. Ramaiah University, Bangalore. He's also received the Academic Excellence Award as the top-ranked student in the AI & ML Department for 2024-2025.";
+      response = "Mahesh has an impressive track record! 🏆 He participated in Anveshan International Hackathon 2025 and secured 2nd place in Anveshan Hackathon (Zonal) 2024. He's also the top-ranked student in AI & ML Department for 2024-2025!";
       newSuggestions = ['Tell me about certifications', 'Show technical skills', 'View projects', 'Academic performance'];
       emoji = '🏆';
       checkAndAwardBadge('achievement_hunter');
     }
 
     // Join/Collaboration
-    else if (message.includes("join") || message.includes("collaborate") || message.includes("team") || message.includes("work together")) {
-      response = `Exciting! Mahesh is always looking for passionate individuals to join CampusConnect. Whether you're a developer, designer, or innovator, there's a place for you! <br><br>🎯 <strong>Join CampusConnect:</strong> <a href='https://mahesh06.me/form/' target='_blank' style='color: #6C63FF; text-decoration: underline;'>https://mahesh06.me/form/</a><br><br>Fill out the form and Mahesh will get back to you about collaboration opportunities!`;
+    else if (message.includes("join") || message.includes("collaborate") || message.includes("team")) {
+      response = `Exciting! Mahesh is building an amazing team for CampusConnect. Whether you're a developer, designer, or innovator, there's a place for you! <br><br>🎯 <strong>Join the revolution:</strong> <a href='https://mahesh06.me/form/' target='_blank' style='color: #6366f1; text-decoration: underline;'>Apply to Join CampusConnect</a><br><br>Let's build the future of campus life together! 🚀`;
       newSuggestions = ['Tell me about CampusConnect', 'What skills are needed?', 'Contact Mahesh directly', 'View other projects'];
       emoji = '🤝';
     }
 
-    // Thanks with personality
+    // Thanks
     else if (message.includes('thank') || message.includes('thanks')) {
-      response = "You're very welcome! I'm happy to help. If you have any other questions about Mahesh's work, projects, or experience, feel free to ask!";
+      response = "You're very welcome! I'm here whenever you need help exploring Mahesh's work. Feel free to ask anything else! 😊";
       newSuggestions = ['Ask another question', 'Download resume', 'Contact Mahesh', 'Explore more projects'];
       emoji = '😊';
     }
 
     // Easter eggs
     else if (message.includes('open sesame')) {
-      response = "🎉 Easter egg found! Here's a fun fact: Mahesh once debugged a complex algorithm at 3 AM with nothing but coffee and determination. The bug? A missing semicolon! ☕";
+      response = "🎉 Easter egg discovered! Here's a fun fact: Mahesh once debugged a complex algorithm at 3 AM with nothing but coffee and determination. The bug? A missing semicolon! ☕ Sometimes the smallest things make the biggest difference!";
       newSuggestions = ['Tell me more fun facts', 'Show me projects', 'What are your skills?'];
       emoji = '🎉';
       checkAndAwardBadge('easter_egg_hunter');
     }
 
     else if (message.includes('joke')) {
-      response = "😄 I focus on Mahesh's work, but here's one: Why do programmers prefer dark mode? Because light attracts bugs! 🐛";
+      response = "😄 Here's one for you: Why do programmers prefer dark mode? Because light attracts bugs! 🐛 Speaking of bugs, Mahesh is great at squashing them!";
       newSuggestions = ['Tell me about Mahesh', 'Show me projects', 'What are your skills?'];
       emoji = '😄';
     }
 
-    // Handle vague queries
-    else if (message.includes('tell me more') || message.includes('more info')) {
-      response = "I'd be happy to share more! What specifically interests you?";
-      newSuggestions = ['Mahesh\'s projects', 'Technical skills', 'Achievements & awards', 'Contact information'];
-      emoji = '🤔';
-    }
-
-    // Default response with suggestions
+    // Default response
     else {
-      response = "I specialize in providing information about Mahesh's professional background, projects, and expertise. What would you like to learn about today?";
+      response = "I'd love to help you learn about Mahesh's work! What specifically interests you?";
       newSuggestions = ['Show me projects', 'Tell me about skills', 'Contact information', 'Achievements & awards'];
       emoji = '🤖';
     }
@@ -382,12 +356,9 @@ const Chatbot = () => {
       const newBadge = { ...badgeDefinitions[badgeType], type: badgeType, earned: new Date() };
       setBadges(prev => [...prev, newBadge]);
       
-      // Show badge notification
-      setTimeout(() => {
-        if (soundEnabled) {
-          playNotificationSound();
-        }
-      }, 1000);
+      if (soundEnabled) {
+        playNotificationSound();
+      }
     }
   };
 
@@ -427,8 +398,8 @@ const Chatbot = () => {
       checkAndAwardBadge('conversation_master');
     }
 
-    // Simulate typing delay with enhanced animation
-    const typingDelay = 800 + Math.random() * 1200;
+    // Simulate typing delay
+    const typingDelay = 1000 + Math.random() * 1500;
     setTimeout(() => {
       const botResponseData = getBotResponse(currentInput);
       const botResponse = {
@@ -443,11 +414,6 @@ const Chatbot = () => {
       setMessages(prev => [...prev, botResponse]);
       setSuggestions(botResponseData.suggestions || []);
       setIsTyping(false);
-      
-      // Show feedback after certain interactions
-      if (conversationCount > 0 && conversationCount % 5 === 0) {
-        setShowFeedback(true);
-      }
       
       if (soundEnabled) {
         playNotificationSound();
@@ -521,7 +487,8 @@ const Chatbot = () => {
       text: getWelcomeMessage(),
       sender: 'bot',
       timestamp: new Date(),
-      suggestions: ['Tell me about CampusConnect', 'What are your skills?', 'How can I contact you?', 'Show me your projects']
+      suggestions: ['Tell me about CampusConnect', 'What are your skills?', 'How can I contact you?', 'Show me your projects'],
+      emoji: '👋'
     }]);
     setConversationCount(0);
     setSuggestions(['Tell me about CampusConnect', 'What are your skills?', 'How can I contact you?', 'Show me your projects']);
@@ -530,7 +497,8 @@ const Chatbot = () => {
 
   // Format time
   const formatTime = (timestamp) => {
-    return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const date = timestamp instanceof Date ? timestamp : new Date(timestamp);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   // Get placeholder text
@@ -545,11 +513,19 @@ const Chatbot = () => {
     return placeholders[Math.floor(Math.random() * placeholders.length)];
   };
 
+  // Message reactions
+  const handleMessageReaction = (messageId, reaction) => {
+    setMessageReactions(prev => ({
+      ...prev,
+      [messageId]: reaction
+    }));
+  };
+
   if (!isOpen) {
     return (
       <button
         onClick={handleOpenChat}
-        className={`fixed bottom-6 right-6 z-40 p-4 rounded-full shadow-2xl transition-all duration-500 touch-manipulation ${currentTheme.gradient} text-white hover:shadow-xl transform hover:scale-110 group animate-pulse-glow`}
+        className={`fixed bottom-6 right-6 z-40 p-4 rounded-full shadow-2xl transition-all duration-500 touch-manipulation bg-gradient-to-r ${currentTheme.primary} text-white hover:shadow-xl transform hover:scale-110 group animate-pulse-glow`}
         style={{
           marginBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
           marginRight: 'max(1.5rem, env(safe-area-inset-right))'
@@ -562,14 +538,14 @@ const Chatbot = () => {
             {badges.length}
           </div>
         )}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400 opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
+        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/20 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </button>
     );
   }
 
   return (
     <div 
-      className={`fixed bottom-6 right-6 z-40 ${isMinimized ? 'w-72' : 'w-[calc(100vw-3rem)] max-w-sm md:w-80'} chatbot-container rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex flex-col ${isMinimized ? 'h-14' : 'h-[75vh] md:h-[28rem]'} transition-all duration-500 animate-slide-up`}
+      className={`fixed bottom-6 right-6 z-40 ${isMinimized ? 'w-80' : 'w-[calc(100vw-3rem)] max-w-md'} bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex flex-col ${isMinimized ? 'h-16' : 'h-[32rem]'} transition-all duration-500 animate-slide-up`}
       style={{
         marginBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
         marginRight: 'max(1.5rem, env(safe-area-inset-right))',
@@ -577,8 +553,8 @@ const Chatbot = () => {
       }}
     >
       
-      {/* Header with Professional Gradient */}
-      <div className={`${currentTheme.gradient} text-white p-4 flex-shrink-0 relative overflow-hidden`}>
+      {/* Enhanced Header */}
+      <div className={`bg-gradient-to-r ${currentTheme.primary} text-white p-4 flex-shrink-0 relative overflow-hidden`}>
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
         <div className="relative z-10 flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -594,7 +570,16 @@ const Chatbot = () => {
                 {badges.length > 0 && <Sparkles className="h-3 w-3 ml-2 animate-pulse" />}
               </h3>
               <p className="text-xs text-white/90">
-                {isTyping ? 'Typing...' : 'Online • Ready to help'}
+                {isTyping ? (
+                  <span className="flex items-center">
+                    <span>Typing</span>
+                    <span className="ml-1 flex space-x-1">
+                      <span className="w-1 h-1 bg-white/70 rounded-full animate-bounce"></span>
+                      <span className="w-1 h-1 bg-white/70 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></span>
+                      <span className="w-1 h-1 bg-white/70 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></span>
+                    </span>
+                  </span>
+                ) : 'Online • Ready to help'}
               </p>
             </div>
           </div>
@@ -632,28 +617,28 @@ const Chatbot = () => {
             <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm border-b border-gray-200/50 dark:border-gray-700/50 p-4 space-y-3 settings-slide">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 block">Personality</label>
-                  <select
-                    value={botPersonality}
-                    onChange={(e) => setBotPersonality(e.target.value)}
-                    className="w-full text-xs p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
-                  >
-                    {Object.entries(personalities).map(([key, personality]) => (
-                      <option key={key} value={key}>{personality.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
                   <label className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 block">Theme</label>
                   <select
                     value={chatTheme}
                     onChange={(e) => setChatTheme(e.target.value)}
                     className="w-full text-xs p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
                   >
-                    <option value="gradient">🌈 Professional</option>
+                    <option value="gradient">🌈 Gradient</option>
                     <option value="blue">🔵 Blue</option>
                     <option value="purple">🟣 Purple</option>
                     <option value="green">🟢 Green</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-gray-700 dark:text-gray-300 mb-1 block">Font Size</label>
+                  <select
+                    value={fontSize}
+                    onChange={(e) => setFontSize(e.target.value)}
+                    className="w-full text-xs p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
+                  >
+                    <option value="small">Small</option>
+                    <option value="medium">Medium</option>
+                    <option value="large">Large</option>
                   </select>
                 </div>
               </div>
@@ -661,39 +646,32 @@ const Chatbot = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <button
-                    onClick={() => setFontSize(fontSize === 'small' ? 'medium' : fontSize === 'medium' ? 'large' : 'small')}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 btn-hover-lift"
-                    title="Font Size"
-                  >
-                    <Type className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => setCompactMode(!compactMode)}
-                    className={`p-2 rounded-lg transition-all duration-200 btn-hover-lift ${compactMode ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
-                    title="Compact Mode"
-                  >
-                    <Minimize2 className="h-4 w-4" />
-                  </button>
-                  <button
                     onClick={() => setSoundEnabled(!soundEnabled)}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 btn-hover-lift"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200"
                     title="Sound"
                   >
                     {soundEnabled ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+                  </button>
+                  <button
+                    onClick={() => setCompactMode(!compactMode)}
+                    className={`p-2 rounded-lg transition-all duration-200 ${compactMode ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-600' : 'hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                    title="Compact Mode"
+                  >
+                    <Minimize2 className="h-4 w-4" />
                   </button>
                 </div>
                 
                 <div className="flex items-center space-x-1">
                   <button
                     onClick={exportChat}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 btn-hover-lift export-glow"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 text-green-600"
                     title="Export Chat"
                   >
                     <Download className="h-4 w-4" />
                   </button>
                   <button
                     onClick={clearChat}
-                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-red-500 transition-all duration-200 btn-hover-lift clear-warning"
+                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-red-500 transition-all duration-200"
                     title="Clear Chat"
                   >
                     <X className="h-4 w-4" />
@@ -711,7 +689,7 @@ const Chatbot = () => {
                 {badges.map((badge, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center space-x-1 bg-yellow-100/90 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-full text-xs whitespace-nowrap backdrop-blur-sm border border-yellow-200/50 dark:border-yellow-700/50 badge-notification"
+                    className="inline-flex items-center space-x-1 bg-yellow-100/90 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-full text-xs whitespace-nowrap backdrop-blur-sm border border-yellow-200/50 dark:border-yellow-700/50"
                     title={badge.description}
                   >
                     <span>{badge.icon}</span>
@@ -722,7 +700,7 @@ const Chatbot = () => {
             </div>
           )}
 
-          {/* Messages */}
+          {/* Enhanced Messages */}
           <div 
             ref={messagesContainerRef}
             onScroll={handleScroll}
@@ -731,14 +709,15 @@ const Chatbot = () => {
             {messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} message-animation`}
+                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'} message-animation group`}
               >
                 <div className={`flex space-x-3 max-w-[85%] ${
                   message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : 'flex-row'
                 }`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm ${
+                  {/* Enhanced Avatar */}
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 group-hover:scale-110 ${
                     message.sender === 'user' 
-                      ? currentTheme.gradient + ' text-white'
+                      ? `bg-gradient-to-r ${currentTheme.primary} text-white`
                       : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
                   }`}>
                     {message.sender === 'user' ? (
@@ -747,23 +726,50 @@ const Chatbot = () => {
                       <Bot className="h-4 w-4" />
                     )}
                   </div>
-                  <div className={`rounded-2xl ${compactMode ? 'p-3' : 'p-4'} shadow-sm hover:shadow-md transition-all duration-300 message-bubble ${
+                  
+                  {/* Enhanced Message Bubble */}
+                  <div className={`rounded-2xl ${compactMode ? 'p-3' : 'p-4'} shadow-sm hover:shadow-md transition-all duration-300 message-bubble relative group/message ${
                     message.sender === 'user'
-                      ? currentTheme.gradient + ' text-white'
+                      ? `bg-gradient-to-r ${currentTheme.primary} text-white`
                       : 'bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 border border-gray-200/50 dark:border-gray-700/50'
                   } backdrop-blur-sm`}>
                     <div className="flex items-start space-x-2">
                       {message.emoji && message.sender === 'bot' && (
-                        <span className="text-lg flex-shrink-0">{message.emoji}</span>
+                        <span className="text-lg flex-shrink-0 animate-bounce">{message.emoji}</span>
                       )}
                       <div className={`${fontSizes[fontSize]} leading-relaxed flex-1`} 
                            dangerouslySetInnerHTML={{ __html: message.text }} />
                     </div>
-                    <p className={`text-xs mt-2 opacity-70 ${
-                      message.sender === 'user' ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'
-                    }`}>
-                      {formatTime(message.timestamp)}
-                    </p>
+                    
+                    {/* Message Actions */}
+                    <div className="flex items-center justify-between mt-2">
+                      <p className={`text-xs opacity-70 ${
+                        message.sender === 'user' ? 'text-white/70' : 'text-gray-500 dark:text-gray-400'
+                      }`}>
+                        {formatTime(message.timestamp)}
+                      </p>
+                      
+                      {message.sender === 'bot' && (
+                        <div className="flex items-center space-x-1 opacity-0 group-hover/message:opacity-100 transition-opacity duration-200">
+                          <button
+                            onClick={() => handleMessageReaction(message.id, 'like')}
+                            className={`p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                              messageReactions[message.id] === 'like' ? 'text-green-500' : 'text-gray-400'
+                            }`}
+                          >
+                            <ThumbsUp className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={() => handleMessageReaction(message.id, 'dislike')}
+                            className={`p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                              messageReactions[message.id] === 'dislike' ? 'text-red-500' : 'text-gray-400'
+                            }`}
+                          >
+                            <ThumbsDown className="h-3 w-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -777,10 +783,13 @@ const Chatbot = () => {
                     <Bot className="h-4 w-4" />
                   </div>
                   <div className="bg-white/90 dark:bg-gray-800/90 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-4 shadow-sm backdrop-blur-sm">
-                    <div className="enhanced-typing">
-                      <div className="dot"></div>
-                      <div className="dot"></div>
-                      <div className="dot"></div>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-2 h-2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">Mahesh's AI is thinking...</span>
                     </div>
                   </div>
                 </div>
@@ -789,53 +798,29 @@ const Chatbot = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Suggestions */}
+          {/* Enhanced Suggestions */}
           {suggestions.length > 0 && !isTyping && (
             <div className="px-4 pb-3 bg-gray-50/50 dark:bg-gray-800/50 flex-shrink-0 backdrop-blur-sm">
               <div className="grid grid-cols-1 gap-2">
-                {suggestions.slice(0, 4).map((suggestion, index) => (
+                {suggestions.slice(0, 3).map((suggestion, index) => (
                   <button
                     key={index}
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className={`text-left text-xs p-3 bg-white/90 dark:bg-gray-800/90 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-xl transition-all duration-200 ${currentTheme.accent} border border-gray-200/50 dark:border-gray-700/50 touch-manipulation hover:shadow-md suggestion-btn backdrop-blur-sm font-medium`}
+                    className={`text-left text-xs p-3 bg-white/90 dark:bg-gray-800/90 hover:bg-gradient-to-r hover:${currentTheme.primary} hover:text-white rounded-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 touch-manipulation hover:shadow-md hover:scale-[1.02] transform backdrop-blur-sm font-medium group`}
                   >
-                    {suggestion}
+                    <span className="flex items-center justify-between">
+                      <span>{suggestion}</span>
+                      <span className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <ArrowRight className="h-3 w-3" />
+                      </span>
+                    </span>
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Feedback */}
-          {showFeedback && (
-            <div className="bg-blue-50/90 dark:bg-blue-900/20 border-t border-gray-200/50 dark:border-gray-700/50 p-3 backdrop-blur-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">Was this helpful?</span>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => setShowFeedback(false)}
-                    className="p-2 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-lg transition-all duration-200 feedback-btn"
-                  >
-                    <ThumbsUp className="h-4 w-4 text-green-600" />
-                  </button>
-                  <button
-                    onClick={() => setShowFeedback(false)}
-                    className="p-2 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-lg transition-all duration-200 feedback-btn"
-                  >
-                    <ThumbsDown className="h-4 w-4 text-red-600" />
-                  </button>
-                  <button
-                    onClick={() => setShowFeedback(false)}
-                    className="p-2 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-lg transition-all duration-200"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Input */}
+          {/* Enhanced Input */}
           <div className="border-t border-gray-200/50 dark:border-gray-700/50 p-4 bg-white/90 dark:bg-gray-900/90 flex-shrink-0 backdrop-blur-sm">
             <div className="flex space-x-3">
               <input
@@ -846,17 +831,18 @@ const Chatbot = () => {
                 onKeyDown={handleKeyDown}
                 placeholder={getPlaceholder()}
                 disabled={isTyping}
-                className={`flex-1 px-4 py-3 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${fontSizes[fontSize]} bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white disabled:opacity-50 transition-all duration-200 backdrop-blur-sm shadow-sm hover:shadow-md`}
+                className={`flex-1 px-4 py-3 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${fontSizes[fontSize]} bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white disabled:opacity-50 transition-all duration-200 backdrop-blur-sm shadow-sm hover:shadow-md placeholder-gray-400 dark:placeholder-gray-500`}
                 style={{ fontSize: '16px' }}
               />
               
+              {/* Enhanced Voice Input */}
               {recognition.current && (
                 <button
                   onClick={toggleVoiceInput}
                   disabled={isTyping}
                   className={`p-3 rounded-xl transition-all duration-200 touch-manipulation shadow-sm hover:shadow-md ${
                     isListening 
-                      ? 'bg-red-600 text-white voice-pulse' 
+                      ? 'bg-red-500 text-white animate-pulse' 
                       : 'bg-gray-200/90 dark:bg-gray-700/90 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                   } disabled:opacity-50 backdrop-blur-sm`}
                 >
@@ -864,10 +850,11 @@ const Chatbot = () => {
                 </button>
               )}
               
+              {/* Enhanced Send Button */}
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isTyping}
-                className={`p-3 ${currentTheme.gradient} text-white rounded-xl hover:opacity-90 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 touch-manipulation shadow-sm hover:shadow-md backdrop-blur-sm`}
+                className={`p-3 bg-gradient-to-r ${currentTheme.primary} text-white rounded-xl hover:opacity-90 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 touch-manipulation shadow-sm hover:shadow-md backdrop-blur-sm hover:scale-105 transform`}
               >
                 <Send className="h-4 w-4" />
               </button>
