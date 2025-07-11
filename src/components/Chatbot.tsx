@@ -3,7 +3,7 @@ import {
   MessageCircle, X, Send, Bot, User, Minimize2, Maximize2, Volume2, VolumeX,
   Download, Settings, Palette, Type, Moon, Sun, Mic, MicOff, Copy, 
   ThumbsUp, ThumbsDown, Calendar, QrCode, FileText, ExternalLink,
-  Sparkles, Trophy, Coffee, Zap, Heart, Star, MoreHorizontal, Smile
+  Sparkles, Trophy, Coffee, Zap, Heart, Star, MoreHorizontal, Smile, ArrowRight
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
