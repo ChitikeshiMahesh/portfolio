@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowDown, Download, Github, Linkedin, Mail, Eye } from 'lucide-react';
+import { ArrowDown, Download, Github, Linkedin, Mail, Eye, ChevronDown, Sparkles, Code, Zap } from 'lucide-react';
 import ResumeViewer from './ResumeViewer';
 
 const Hero = () => {
@@ -75,19 +75,32 @@ const Hero = () => {
               </p>
             </div>
 
-            {/* Tagline with Enhanced Animation */}
-            <div className={`space-y-1 sm:space-y-2 px-3 transition-all duration-1000 delay-600 ${
+            {/* Enhanced Tagline with Mission Statement */}
+            <div className={`space-y-2 sm:space-y-3 px-3 transition-all duration-1000 delay-600 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-300 font-medium">
-                Driven by <span className="text-indigo-600 dark:text-indigo-400 font-semibold">curiosity</span> and a love for creating <span className="text-purple-600 dark:text-purple-400 font-semibold">practical solutions</span>.
-              </p>
-              <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto leading-relaxed font-light">
-                I enjoy building modern, efficient web applications that solve real-world problems.
-              </p>
+              <div className="flex items-center justify-center space-x-2 mb-3">
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-500 animate-pulse" />
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-700 dark:text-gray-300 font-medium">
+                  Driven by <span className="text-indigo-600 dark:text-indigo-400 font-semibold">curiosity</span> and a love for creating <span className="text-purple-600 dark:text-purple-400 font-semibold">practical solutions</span>
+                </p>
+                <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500 animate-pulse" style={{ animationDelay: '0.5s' }} />
+              </div>
+              
+              {/* Mission Statement */}
+              <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-indigo-100 dark:border-indigo-800 shadow-lg max-w-2xl mx-auto">
+                <div className="flex items-center justify-center space-x-2 mb-2">
+                  <Code className="h-4 w-4 text-indigo-500" />
+                  <span className="text-xs sm:text-sm font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">Mission</span>
+                  <Zap className="h-4 w-4 text-purple-500" />
+                </div>
+                <p className="text-sm sm:text-base text-gray-700 dark:text-gray-300 leading-relaxed font-medium">
+                  Building innovative web applications that solve real-world problems while exploring the frontiers of AI and machine learning.
+                </p>
+              </div>
             </div>
 
-            {/* CTA Buttons with Staggered Animation */}
+            {/* Enhanced CTA Buttons with Hover Effects */}
             <div className={`flex flex-col space-y-3 sm:space-y-4 justify-center items-center px-3 sm:px-4 transition-all duration-1000 delay-800 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}>
@@ -113,6 +126,7 @@ const Hero = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <Eye className="relative h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 transition-transform duration-300 z-10" />
                   <span className="relative z-10">View Resume</span>
+                  <div className="absolute inset-0 rounded-full bg-indigo-100/50 scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
                 </button>
                 
                 <button 
@@ -122,53 +136,58 @@ const Hero = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   <Download className="relative h-4 w-4 sm:h-5 sm:w-5 group-hover:scale-110 group-hover:-translate-y-0.5 transition-transform duration-300 z-10" />
                   <span className="relative z-10">Download</span>
+                  <div className="absolute inset-0 rounded-full bg-indigo-100/50 scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 transition-all duration-500"></div>
                 </button>
               </div>
             </div>
 
-            {/* Social Links with Enhanced Animation */}
+            {/* Enhanced Social Links */}
             <div className={`flex justify-center space-x-4 sm:space-x-6 pt-4 sm:pt-6 md:pt-8 transition-all duration-1000 delay-1200 ${
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
             }`}>
               <a 
                 href="https://github.com/Mahesh-ch06" 
-                className="group text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 p-2 touch-manipulation hover:scale-110 hover:-translate-y-1 relative"
+                className="group text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 p-3 touch-manipulation hover:scale-110 hover:-translate-y-1 relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50"
                 aria-label="GitHub Profile"
               >
                 <Github className="h-5 w-5 sm:h-6 sm:w-6 group-hover:rotate-12 transition-transform duration-300" />
-                <div className="absolute inset-0 bg-indigo-100 dark:bg-indigo-900/30 rounded-full scale-0 group-hover:scale-150 opacity-0 group-hover:opacity-100 transition-all duration-300 -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-full scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 transition-all duration-300 -z-10"></div>
               </a>
               <a 
                 href="https://www.linkedin.com/in/mahesh-chitikeshi-b7a0982b9/" 
-                className="group text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 p-2 touch-manipulation hover:scale-110 hover:-translate-y-1 relative"
+                className="group text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 p-3 touch-manipulation hover:scale-110 hover:-translate-y-1 relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50"
                 aria-label="LinkedIn Profile"
               >
                 <Linkedin className="h-5 w-5 sm:h-6 sm:w-6 group-hover:rotate-12 transition-transform duration-300" />
-                <div className="absolute inset-0 bg-indigo-100 dark:bg-indigo-900/30 rounded-full scale-0 group-hover:scale-150 opacity-0 group-hover:opacity-100 transition-all duration-300 -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-full scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 transition-all duration-300 -z-10"></div>
               </a>
               <a 
                 href="mailto:chitikeshimahesh6@gmail.com" 
-                className="group text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 p-2 touch-manipulation hover:scale-110 hover:-translate-y-1 relative"
+                className="group text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300 p-3 touch-manipulation hover:scale-110 hover:-translate-y-1 relative bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl border border-gray-200/50 dark:border-gray-700/50"
                 aria-label="Email Contact"
               >
                 <Mail className="h-5 w-5 sm:h-6 sm:w-6 group-hover:rotate-12 transition-transform duration-300" />
-                <div className="absolute inset-0 bg-indigo-100 dark:bg-indigo-900/30 rounded-full scale-0 group-hover:scale-150 opacity-0 group-hover:opacity-100 transition-all duration-300 -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-full scale-0 group-hover:scale-100 opacity-0 group-hover:opacity-100 transition-all duration-300 -z-10"></div>
               </a>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Scroll Indicator - Hidden on mobile */}
+        {/* Enhanced Scroll Indicator */}
         <div className={`absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 hidden md:block transition-all duration-1000 delay-1400 ${
           isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
           <div className="group cursor-pointer" onClick={scrollToProjects}>
-            <div className="w-5 h-8 sm:w-6 sm:h-10 border-2 border-gray-400 dark:border-gray-500 rounded-full flex justify-center hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors duration-300 group-hover:scale-110">
-              <div className="w-1 h-2 sm:h-3 bg-gray-400 dark:bg-gray-500 rounded-full mt-2 animate-gentle-bounce group-hover:bg-indigo-500 dark:group-hover:bg-indigo-400 transition-colors duration-300"></div>
+            <div className="flex flex-col items-center space-y-2">
+              <div className="w-6 h-10 border-2 border-gray-400 dark:border-gray-500 rounded-full flex justify-center hover:border-indigo-500 dark:hover:border-indigo-400 transition-colors duration-300 group-hover:scale-110 relative overflow-hidden">
+                <div className="w-1 h-3 bg-gray-400 dark:bg-gray-500 rounded-full mt-2 animate-gentle-bounce group-hover:bg-indigo-500 dark:group-hover:bg-indigo-400 transition-colors duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-b from-indigo-100/50 to-purple-100/50 dark:from-indigo-900/30 dark:to-purple-900/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
+              </div>
+              <div className="flex flex-col items-center space-y-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <ChevronDown className="h-4 w-4 text-indigo-500 animate-bounce" />
+                <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">Scroll to explore</p>
+              </div>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-center">
-              Scroll to explore
-            </p>
           </div>
         </div>
 

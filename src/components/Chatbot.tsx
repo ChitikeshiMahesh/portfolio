@@ -1,22 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { 
   MessageCircle, X, Send, Bot, User, Minimize2, Maximize2, Volume2, VolumeX,
-  Download, Settings, Palette, Type, Moon, Sun, Mic, MicOff, Copy, 
-  ThumbsUp, ThumbsDown, Calendar, QrCode, FileText, ExternalLink,
-  Sparkles, Trophy, Coffee, Zap, Heart, Star, MoreHorizontal, Smile, ArrowRight
+  Download, Settings, Moon, Sun, Mic, MicOff, Copy, 
+  ThumbsUp, ThumbsDown, Calendar, FileText, ExternalLink,
+  Sparkles, Trophy, Coffee, Zap, Heart, Star, MoreHorizontal, Smile, ArrowRight,
+  Code, Briefcase, Award, Phone, Mail, Github, Linkedin, ChevronRight, Expand
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [userName, setUserName] = useState('');
   const [conversationCount, setConversationCount] = useState(0);
   const [showSettings, setShowSettings] = useState(false);
-  const [botPersonality, setBotPersonality] = useState('professional');
   const [fontSize, setFontSize] = useState('medium');
   const [compactMode, setCompactMode] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -25,12 +26,12 @@ const Chatbot = () => {
   const [inputHistory, setInputHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState([]);
-  const [showFeedback, setShowFeedback] = useState(false);
   const [badges, setBadges] = useState([]);
   const [isAtBottom, setIsAtBottom] = useState(true);
   const [hasOpenedBefore, setHasOpenedBefore] = useState(false);
-  const [showQuickActions, setShowQuickActions] = useState(false);
   const [messageReactions, setMessageReactions] = useState({});
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewMessage, setPreviewMessage] = useState('');
   
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -65,7 +66,7 @@ const Chatbot = () => {
         text: getWelcomeMessage(),
         sender: 'bot',
         timestamp: new Date(),
-        suggestions: ['Tell me about CampusConnect', 'What are your skills?', 'How can I contact you?', 'Show me your projects'],
+        suggestions: ['💼 Tell me about projects', '🧠 What are your skills?', '📞 How can I contact you?', '🏆 Show achievements'],
         emoji: '👋'
       };
       setMessages([welcomeMessage]);
@@ -77,7 +78,6 @@ const Chatbot = () => {
     
     if (savedSettings) {
       const settings = JSON.parse(savedSettings);
-      setBotPersonality(settings.personality || 'professional');
       setFontSize(settings.fontSize || 'medium');
       setCompactMode(settings.compactMode || false);
       setSoundEnabled(settings.soundEnabled !== false);
@@ -115,11 +115,27 @@ const Chatbot = () => {
         setIsListening(false);
       };
     }
+
+    // Show preview message after delay
+    const previewTimer = setTimeout(() => {
+      if (!hasOpened) {
+        setShowPreview(true);
+        setPreviewMessage("👋 Hi! I'm MaheshBot. Want to explore his projects?");
+        
+        // Hide preview after 5 seconds
+        setTimeout(() => {
+          setShowPreview(false);
+        }, 5000);
+      }
+    }, 3000);
+
+    return () => clearTimeout(previewTimer);
   }, []);
 
   // Handle opening chatbot
   const handleOpenChat = () => {
     setIsOpen(true);
+    setShowPreview(false);
     if (!hasOpenedBefore) {
       localStorage.setItem('chatbot-opened-before', 'true');
       setHasOpenedBefore(true);
@@ -141,14 +157,13 @@ const Chatbot = () => {
 
   useEffect(() => {
     const settings = {
-      personality: botPersonality,
       fontSize,
       compactMode,
       soundEnabled,
       chatTheme
     };
     localStorage.setItem('chatbot-settings', JSON.stringify(settings));
-  }, [botPersonality, fontSize, compactMode, soundEnabled, chatTheme]);
+  }, [fontSize, compactMode, soundEnabled, chatTheme]);
 
   useEffect(() => {
     localStorage.setItem('chatbot-badges', JSON.stringify(badges));
@@ -176,6 +191,12 @@ const Chatbot = () => {
 
   // Theme configurations
   const themes = {
+    gradient: { 
+      primary: 'from-indigo-500 via-purple-500 to-pink-500', 
+      secondary: 'bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20', 
+      accent: 'text-indigo-600 dark:text-indigo-400',
+      gradient: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500'
+    },
     blue: { 
       primary: 'from-blue-500 to-blue-600', 
       secondary: 'bg-blue-50 dark:bg-blue-900/20', 
@@ -193,12 +214,6 @@ const Chatbot = () => {
       secondary: 'bg-green-50 dark:bg-green-900/20', 
       accent: 'text-green-600 dark:text-green-400',
       gradient: 'bg-gradient-to-r from-green-500 to-green-600'
-    },
-    gradient: { 
-      primary: 'from-indigo-500 via-purple-500 to-pink-500', 
-      secondary: 'bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20', 
-      accent: 'text-indigo-600 dark:text-indigo-400',
-      gradient: 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500'
     }
   };
 
@@ -212,12 +227,19 @@ const Chatbot = () => {
   };
 
   const getWelcomeMessage = () => {
+    const greetings = [
+      "Hi! I'm MaheshBot. Want to explore his projects?",
+      "Hello! I'm here to help you learn about Mahesh's work.",
+      "Welcome! I can tell you about Mahesh's projects and skills.",
+      "Hi there! Ready to discover Mahesh's amazing work?"
+    ];
+    
     if (hasOpenedBefore && userName) {
       return `Welcome back, ${userName}! What would you like to explore today?`;
     } else if (hasOpenedBefore) {
       return "Welcome back! What would you like to explore today?";
     } else {
-      return "Hi! I'm Mahesh's AI assistant. I can help you learn about his projects, skills, and experience. What would you like to know?";
+      return greetings[Math.floor(Math.random() * greetings.length)];
     }
   };
 
@@ -236,7 +258,7 @@ const Chatbot = () => {
         setUserName("Mahesh");
         return {
           text: "What a pleasant coincidence! Always a pleasure to meet another Mahesh. How may I assist you with Mr. Chitikeshi Mahesh's portfolio?",
-          suggestions: ['Tell me about CampusConnect', 'What are your skills?', 'Show me achievements'],
+          suggestions: ['💼 Tell me about CampusConnect', '🧠 What are your skills?', '🏆 Show achievements'],
           emoji: '🤝'
         };
       } else if (extractedName) {
@@ -244,7 +266,7 @@ const Chatbot = () => {
         setUserName(formattedName);
         return {
           text: `Nice to meet you, ${formattedName}! I'm here to help you learn about Mahesh's work. What interests you most?`,
-          suggestions: ['Show me projects', 'Tell me about skills', 'Contact information'],
+          suggestions: ['💼 Show me projects', '🧠 Tell me about skills', '📞 Contact information'],
           emoji: '👋'
         };
       }
@@ -254,14 +276,14 @@ const Chatbot = () => {
     if (/^(hi|hello|hey|hii|namaste)\b/.test(message)) {
       const personalizedGreeting = userName ? `Hello again, ${userName}! ` : "Hello! ";
       response = personalizedGreeting + "How can I help you explore Mahesh's work today?";
-      newSuggestions = ['Tell me about CampusConnect', 'What are your skills?', 'Show me projects', 'Contact info'];
+      newSuggestions = ['💼 Tell me about CampusConnect', '🧠 What are your skills?', '💻 Show me projects', '📞 Contact info'];
       emoji = '👋';
     }
 
     // CampusConnect
     else if (message.includes("campusconnect") || message.includes("campus connect")) {
       response = "CampusConnect is Mahesh's flagship startup project! 🚀 It's revolutionizing campus life by providing a unified platform for food orders, Xerox services, and other campus essentials. Built with Firebase authentication and role-based access, it's launching in 2026. <br><br>🌟 <strong>Want to join the team?</strong> Visit: <a href='https://mahesh06.me/form/' target='_blank' style='color: #6366f1; text-decoration: underline;'>Join CampusConnect</a>";
-      newSuggestions = ['How to join CampusConnect?', 'When will it launch?', 'What technologies are used?', 'Show other projects'];
+      newSuggestions = ['🤝 How to join CampusConnect?', '📅 When will it launch?', '⚙️ What technologies are used?', '💻 Show other projects'];
       emoji = '🚀';
       checkAndAwardBadge('project_explorer');
     }
@@ -269,7 +291,7 @@ const Chatbot = () => {
     // Projects
     else if (message.includes('project') || message.includes('work')) {
       response = "Mahesh has built some amazing projects! His flagship is <strong>CampusConnect</strong> - a startup revolutionizing campus life. He's also created a Personal Portfolio, DSA Resource Platform, and Digital Diary App. Each showcases different aspects of full-stack development.";
-      newSuggestions = ['Tell me about CampusConnect', 'Show DSA Resource Platform', 'Personal Portfolio details', 'Digital Diary App'];
+      newSuggestions = ['🚀 Tell me about CampusConnect', '📚 Show DSA Resource Platform', '🌐 Personal Portfolio details', '📝 Digital Diary App'];
       emoji = '💻';
       checkAndAwardBadge('project_explorer');
     }
@@ -277,7 +299,7 @@ const Chatbot = () => {
     // Skills
     else if (message.includes('skill') || message.includes('technology') || message.includes('tech')) {
       response = "Mahesh's expertise spans multiple domains: <br><br><strong>💻 Programming:</strong> Java, Python, JavaScript, SQL, HTML/CSS<br><strong>🛠️ Technologies:</strong> Git, VS Code, Linux, AWS Cloud, Firebase, React.js, Node.js<br><strong>🎯 Specializations:</strong> Data Structures & Algorithms, Full-Stack Development, AI/ML, Cloud Computing<br><br>He maintains an impressive 9.0 GPA in his CSE program!";
-      newSuggestions = ['Show projects using these skills', 'Tell me about certifications', 'Academic achievements', 'Contact for collaboration'];
+      newSuggestions = ['💻 Show projects using these skills', '🏆 Tell me about certifications', '🎓 Academic achievements', '🤝 Contact for collaboration'];
       emoji = '🛠️';
       checkAndAwardBadge('skill_seeker');
     }
@@ -285,21 +307,21 @@ const Chatbot = () => {
     // Contact
     else if (message.includes('contact') || message.includes('reach') || message.includes('email')) {
       response = `Ready to connect with Mahesh? Here are all the ways:<br><br>📧 <strong>Email:</strong> <a href="mailto:chitikeshimahesh6@gmail.com" style="color: #6366f1; text-decoration: underline;">chitikeshimahesh6@gmail.com</a><br>📱 <strong>Phone:</strong> <a href="tel:+917013295712" style="color: #6366f1; text-decoration: underline;">+91-7013295712</a><br>💼 <strong>LinkedIn:</strong> <a href="https://www.linkedin.com/in/chitikeshimahesh/" target="_blank" style="color: #6366f1; text-decoration: underline;">Connect on LinkedIn</a><br>💻 <strong>GitHub:</strong> <a href="https://github.com/Mahesh-ch06" target="_blank" style="color: #6366f1; text-decoration: underline;">View GitHub Profile</a><br><br>He's always excited to discuss new opportunities! 🌟`;
-      newSuggestions = ['Schedule a meeting', 'Download resume', 'Join CampusConnect', 'View portfolio'];
+      newSuggestions = ['📅 Schedule a meeting', '📄 Download resume', '🤝 Join CampusConnect', '🌐 View portfolio'];
       emoji = '📞';
     }
 
     // Education
     else if (message.includes('education') || message.includes('study') || message.includes('university')) {
       response = "Mahesh is pursuing B.Tech in Computer Science & Engineering (AI & ML) at SR University, Warangal (2023-2027). With an outstanding 9.0 GPA, he's mastered courses in Data Structures, Algorithms, Machine Learning, and more!";
-      newSuggestions = ['Show academic achievements', 'Tell me about projects', 'Certifications earned', 'Skills developed'];
+      newSuggestions = ['🏆 Show academic achievements', '💻 Tell me about projects', '📜 Certifications earned', '🧠 Skills developed'];
       emoji = '🎓';
     }
 
     // Achievements
     else if (message.includes('hackathon') || message.includes('achievement') || message.includes('award')) {
       response = "Mahesh has an impressive track record! 🏆 He participated in Anveshan International Hackathon 2025 and secured 2nd place in Anveshan Hackathon (Zonal) 2024. He's also the top-ranked student in AI & ML Department for 2024-2025!";
-      newSuggestions = ['Tell me about certifications', 'Show technical skills', 'View projects', 'Academic performance'];
+      newSuggestions = ['📜 Tell me about certifications', '🧠 Show technical skills', '💻 View projects', '🎓 Academic performance'];
       emoji = '🏆';
       checkAndAwardBadge('achievement_hunter');
     }
@@ -307,35 +329,35 @@ const Chatbot = () => {
     // Join/Collaboration
     else if (message.includes("join") || message.includes("collaborate") || message.includes("team")) {
       response = `Exciting! Mahesh is building an amazing team for CampusConnect. Whether you're a developer, designer, or innovator, there's a place for you! <br><br>🎯 <strong>Join the revolution:</strong> <a href='https://mahesh06.me/form/' target='_blank' style='color: #6366f1; text-decoration: underline;'>Apply to Join CampusConnect</a><br><br>Let's build the future of campus life together! 🚀`;
-      newSuggestions = ['Tell me about CampusConnect', 'What skills are needed?', 'Contact Mahesh directly', 'View other projects'];
+      newSuggestions = ['🚀 Tell me about CampusConnect', '🧠 What skills are needed?', '📞 Contact Mahesh directly', '💻 View other projects'];
       emoji = '🤝';
     }
 
     // Thanks
     else if (message.includes('thank') || message.includes('thanks')) {
       response = "You're very welcome! I'm here whenever you need help exploring Mahesh's work. Feel free to ask anything else! 😊";
-      newSuggestions = ['Ask another question', 'Download resume', 'Contact Mahesh', 'Explore more projects'];
+      newSuggestions = ['❓ Ask another question', '📄 Download resume', '📞 Contact Mahesh', '🔍 Explore more projects'];
       emoji = '😊';
     }
 
     // Easter eggs
     else if (message.includes('open sesame')) {
       response = "🎉 Easter egg discovered! Here's a fun fact: Mahesh once debugged a complex algorithm at 3 AM with nothing but coffee and determination. The bug? A missing semicolon! ☕ Sometimes the smallest things make the biggest difference!";
-      newSuggestions = ['Tell me more fun facts', 'Show me projects', 'What are your skills?'];
+      newSuggestions = ['😄 Tell me more fun facts', '💻 Show me projects', '🧠 What are your skills?'];
       emoji = '🎉';
       checkAndAwardBadge('easter_egg_hunter');
     }
 
     else if (message.includes('joke')) {
       response = "😄 Here's one for you: Why do programmers prefer dark mode? Because light attracts bugs! 🐛 Speaking of bugs, Mahesh is great at squashing them!";
-      newSuggestions = ['Tell me about Mahesh', 'Show me projects', 'What are your skills?'];
+      newSuggestions = ['💻 Tell me about Mahesh', '🚀 Show me projects', '🧠 What are your skills?'];
       emoji = '😄';
     }
 
     // Default response
     else {
       response = "I'd love to help you learn about Mahesh's work! What specifically interests you?";
-      newSuggestions = ['Show me projects', 'Tell me about skills', 'Contact information', 'Achievements & awards'];
+      newSuggestions = ['💻 Show me projects', '🧠 Tell me about skills', '📞 Contact information', '🏆 Achievements & awards'];
       emoji = '🤖';
     }
 
@@ -423,7 +445,9 @@ const Chatbot = () => {
 
   // Handle suggestion clicks
   const handleSuggestionClick = (suggestion) => {
-    setInputMessage(suggestion);
+    // Remove emoji from suggestion before sending
+    const cleanSuggestion = suggestion.replace(/^[^\w\s]+\s*/, '');
+    setInputMessage(cleanSuggestion);
     setTimeout(() => handleSendMessage(), 100);
   };
 
@@ -487,11 +511,11 @@ const Chatbot = () => {
       text: getWelcomeMessage(),
       sender: 'bot',
       timestamp: new Date(),
-      suggestions: ['Tell me about CampusConnect', 'What are your skills?', 'How can I contact you?', 'Show me your projects'],
+      suggestions: ['💼 Tell me about CampusConnect', '🧠 What are your skills?', '📞 How can I contact you?', '💻 Show me your projects'],
       emoji: '👋'
     }]);
     setConversationCount(0);
-    setSuggestions(['Tell me about CampusConnect', 'What are your skills?', 'How can I contact you?', 'Show me your projects']);
+    setSuggestions(['💼 Tell me about CampusConnect', '🧠 What are your skills?', '📞 How can I contact you?', '💻 Show me your projects']);
     localStorage.removeItem('chatbot-messages');
   };
 
@@ -523,50 +547,89 @@ const Chatbot = () => {
 
   if (!isOpen) {
     return (
-      <button
-        onClick={handleOpenChat}
-        className={`fixed bottom-6 right-6 z-40 p-4 rounded-full shadow-2xl transition-all duration-500 touch-manipulation bg-gradient-to-r ${currentTheme.primary} text-white hover:shadow-xl transform hover:scale-110 group animate-pulse-glow`}
-        style={{
-          marginBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
-          marginRight: 'max(1.5rem, env(safe-area-inset-right))'
-        }}
-        aria-label="Open chat assistant"
-      >
-        <MessageCircle className="h-6 w-6 group-hover:rotate-12 transition-transform duration-300" />
-        {badges.length > 0 && (
-          <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center animate-bounce font-bold">
-            {badges.length}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end space-y-3">
+        {/* Message Preview */}
+        {showPreview && (
+          <div className="bg-white/95 dark:bg-gray-800/95 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-gray-200/50 dark:border-gray-700/50 max-w-xs animate-slide-up">
+            <div className="flex items-start space-x-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <Bot className="h-4 w-4 text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-gray-800 dark:text-gray-200 font-medium">
+                  {previewMessage}
+                </p>
+                <button
+                  onClick={handleOpenChat}
+                  className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium mt-1 flex items-center space-x-1 group"
+                >
+                  <span>Click to chat</span>
+                  <ChevronRight className="h-3 w-3 group-hover:translate-x-1 transition-transform duration-200" />
+                </button>
+              </div>
+            </div>
           </div>
         )}
-        <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/20 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-      </button>
+
+        {/* Enhanced Chatbot Button */}
+        <button
+          onClick={handleOpenChat}
+          className={`group relative p-4 rounded-full shadow-2xl transition-all duration-500 touch-manipulation bg-gradient-to-r ${currentTheme.primary} text-white hover:shadow-xl transform hover:scale-110 animate-pulse-glow overflow-hidden`}
+          style={{
+            marginBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
+            marginRight: 'max(1.5rem, env(safe-area-inset-right))'
+          }}
+          aria-label="Open chat assistant"
+        >
+          {/* Pulsing ring animation */}
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-indigo-400 to-purple-400 animate-ping opacity-75"></div>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-white/20 to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          
+          <MessageCircle className="relative h-6 w-6 group-hover:rotate-12 transition-transform duration-300 z-10" />
+          
+          {/* Badge indicator */}
+          {badges.length > 0 && (
+            <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center animate-bounce font-bold shadow-lg">
+              {badges.length}
+            </div>
+          )}
+          
+          {/* Sparkle effects */}
+          <div className="absolute -top-1 -left-1 w-2 h-2 bg-yellow-300 rounded-full animate-ping opacity-60"></div>
+          <div className="absolute -bottom-1 -right-1 w-1.5 h-1.5 bg-pink-300 rounded-full animate-ping opacity-60" style={{ animationDelay: '0.5s' }}></div>
+        </button>
+      </div>
     );
   }
 
   return (
     <div 
-      className={`fixed bottom-6 right-6 z-40 ${isMinimized ? 'w-80' : 'w-[calc(100vw-3rem)] max-w-md'} bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex flex-col ${isMinimized ? 'h-16' : 'h-[32rem]'} transition-all duration-500 animate-slide-up`}
+      className={`fixed ${isFullScreen ? 'inset-4' : 'bottom-6 right-6'} z-40 ${
+        isMinimized ? 'w-80' : isFullScreen ? 'w-full' : 'w-[calc(100vw-3rem)] max-w-md'
+      } bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-700/50 overflow-hidden flex flex-col ${
+        isMinimized ? 'h-16' : isFullScreen ? 'h-full' : 'h-[32rem]'
+      } transition-all duration-500 animate-slide-up`}
       style={{
-        marginBottom: 'max(1.5rem, env(safe-area-inset-bottom))',
-        marginRight: 'max(1.5rem, env(safe-area-inset-right))',
+        marginBottom: isFullScreen ? '0' : 'max(1.5rem, env(safe-area-inset-bottom))',
+        marginRight: isFullScreen ? '0' : 'max(1.5rem, env(safe-area-inset-right))',
         fontFamily: 'Inter, system-ui, -apple-system, sans-serif'
       }}
     >
       
-      {/* Enhanced Header */}
+      {/* Professional Header */}
       <div className={`bg-gradient-to-r ${currentTheme.primary} text-white p-4 flex-shrink-0 relative overflow-hidden`}>
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
         <div className="relative z-10 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative backdrop-blur-sm border border-white/30">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center relative backdrop-blur-sm border border-white/30 shadow-lg">
               <Bot className="h-5 w-5" />
               {isTyping && (
-                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse border-2 border-white"></div>
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse border-2 border-white shadow-sm"></div>
               )}
             </div>
             <div>
               <h3 className="font-semibold text-sm flex items-center">
-                Mahesh's AI Assistant
+                MaheshBot
                 {badges.length > 0 && <Sparkles className="h-3 w-3 ml-2 animate-pulse" />}
               </h3>
               <p className="text-xs text-white/90">
@@ -585,6 +648,13 @@ const Chatbot = () => {
           </div>
           
           <div className="flex items-center space-x-1">
+            <button
+              onClick={() => setIsFullScreen(!isFullScreen)}
+              className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm"
+              title={isFullScreen ? "Exit Fullscreen" : "Fullscreen"}
+            >
+              <Expand className="h-4 w-4" />
+            </button>
             <button
               onClick={() => setShowSettings(!showSettings)}
               className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200 backdrop-blur-sm"
@@ -689,7 +759,7 @@ const Chatbot = () => {
                 {badges.map((badge, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center space-x-1 bg-yellow-100/90 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-full text-xs whitespace-nowrap backdrop-blur-sm border border-yellow-200/50 dark:border-yellow-700/50"
+                    className="inline-flex items-center space-x-1 bg-yellow-100/90 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-full text-xs whitespace-nowrap backdrop-blur-sm border border-yellow-200/50 dark:border-yellow-700/50 shadow-sm"
                     title={badge.description}
                   >
                     <span>{badge.icon}</span>
@@ -715,10 +785,10 @@ const Chatbot = () => {
                   message.sender === 'user' ? 'flex-row-reverse space-x-reverse' : 'flex-row'
                 }`}>
                   {/* Enhanced Avatar */}
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 group-hover:scale-110 ${
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg transition-all duration-300 group-hover:scale-110 border-2 ${
                     message.sender === 'user' 
-                      ? `bg-gradient-to-r ${currentTheme.primary} text-white`
-                      : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border border-gray-200 dark:border-gray-600'
+                      ? `bg-gradient-to-r ${currentTheme.primary} text-white border-white/30`
+                      : 'bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600'
                   }`}>
                     {message.sender === 'user' ? (
                       <User className="h-4 w-4" />
@@ -727,11 +797,11 @@ const Chatbot = () => {
                     )}
                   </div>
                   
-                  {/* Enhanced Message Bubble */}
-                  <div className={`rounded-2xl ${compactMode ? 'p-3' : 'p-4'} shadow-sm hover:shadow-md transition-all duration-300 message-bubble relative group/message ${
+                  {/* Professional Message Bubble */}
+                  <div className={`rounded-2xl ${compactMode ? 'p-3' : 'p-4'} shadow-lg hover:shadow-xl transition-all duration-300 message-bubble relative group/message border ${
                     message.sender === 'user'
-                      ? `bg-gradient-to-r ${currentTheme.primary} text-white`
-                      : 'bg-white/90 dark:bg-gray-800/90 text-gray-800 dark:text-gray-200 border border-gray-200/50 dark:border-gray-700/50'
+                      ? `bg-gradient-to-r ${currentTheme.primary} text-white border-white/20`
+                      : 'bg-white/95 dark:bg-gray-800/95 text-gray-800 dark:text-gray-200 border-gray-200/50 dark:border-gray-700/50'
                   } backdrop-blur-sm`}>
                     <div className="flex items-start space-x-2">
                       {message.emoji && message.sender === 'bot' && (
@@ -779,17 +849,17 @@ const Chatbot = () => {
             {isTyping && (
               <div className="flex justify-start message-animation">
                 <div className="flex space-x-3 max-w-[85%]">
-                  <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center border border-gray-200 dark:border-gray-600 shadow-sm">
+                  <div className="w-8 h-8 rounded-full bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300 flex items-center justify-center border-2 border-gray-200 dark:border-gray-600 shadow-lg">
                     <Bot className="h-4 w-4" />
                   </div>
-                  <div className="bg-white/90 dark:bg-gray-800/90 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-4 shadow-sm backdrop-blur-sm">
+                  <div className="bg-white/95 dark:bg-gray-800/95 border border-gray-200/50 dark:border-gray-700/50 rounded-2xl p-4 shadow-lg backdrop-blur-sm">
                     <div className="flex items-center space-x-2">
                       <div className="flex space-x-1">
                         <div className="w-2 h-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full animate-bounce"></div>
                         <div className="w-2 h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                         <div className="w-2 h-2 bg-gradient-to-r from-pink-500 to-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                       </div>
-                      <span className="text-xs text-gray-500 dark:text-gray-400">Mahesh's AI is thinking...</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">MaheshBot is thinking...</span>
                     </div>
                   </div>
                 </div>
@@ -798,7 +868,7 @@ const Chatbot = () => {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Enhanced Suggestions */}
+          {/* Enhanced Suggestions with Icons */}
           {suggestions.length > 0 && !isTyping && (
             <div className="px-4 pb-3 bg-gray-50/50 dark:bg-gray-800/50 flex-shrink-0 backdrop-blur-sm">
               <div className="grid grid-cols-1 gap-2">
@@ -806,7 +876,7 @@ const Chatbot = () => {
                   <button
                     key={index}
                     onClick={() => handleSuggestionClick(suggestion)}
-                    className={`text-left text-xs p-3 bg-white/90 dark:bg-gray-800/90 hover:bg-gradient-to-r hover:${currentTheme.primary} hover:text-white rounded-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 touch-manipulation hover:shadow-md hover:scale-[1.02] transform backdrop-blur-sm font-medium group`}
+                    className={`text-left text-xs p-3 bg-white/95 dark:bg-gray-800/95 hover:bg-gradient-to-r hover:${currentTheme.primary} hover:text-white rounded-xl transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 touch-manipulation hover:shadow-lg hover:scale-[1.02] transform backdrop-blur-sm font-medium group shadow-sm`}
                   >
                     <span className="flex items-center justify-between">
                       <span>{suggestion}</span>
@@ -821,7 +891,7 @@ const Chatbot = () => {
           )}
 
           {/* Enhanced Input */}
-          <div className="border-t border-gray-200/50 dark:border-gray-700/50 p-4 bg-white/90 dark:bg-gray-900/90 flex-shrink-0 backdrop-blur-sm">
+          <div className="border-t border-gray-200/50 dark:border-gray-700/50 p-4 bg-white/95 dark:bg-gray-900/95 flex-shrink-0 backdrop-blur-sm">
             <div className="flex space-x-3">
               <input
                 ref={inputRef}
@@ -831,7 +901,7 @@ const Chatbot = () => {
                 onKeyDown={handleKeyDown}
                 placeholder={getPlaceholder()}
                 disabled={isTyping}
-                className={`flex-1 px-4 py-3 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${fontSizes[fontSize]} bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white disabled:opacity-50 transition-all duration-200 backdrop-blur-sm shadow-sm hover:shadow-md placeholder-gray-400 dark:placeholder-gray-500`}
+                className={`flex-1 px-4 py-3 border border-gray-300/50 dark:border-gray-600/50 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${fontSizes[fontSize]} bg-white/95 dark:bg-gray-800/95 text-gray-900 dark:text-white disabled:opacity-50 transition-all duration-200 backdrop-blur-sm shadow-sm hover:shadow-md placeholder-gray-400 dark:placeholder-gray-500`}
                 style={{ fontSize: '16px' }}
               />
               
@@ -842,8 +912,8 @@ const Chatbot = () => {
                   disabled={isTyping}
                   className={`p-3 rounded-xl transition-all duration-200 touch-manipulation shadow-sm hover:shadow-md ${
                     isListening 
-                      ? 'bg-red-500 text-white animate-pulse' 
-                      : 'bg-gray-200/90 dark:bg-gray-700/90 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                      ? 'bg-red-500 text-white animate-pulse shadow-red-500/25' 
+                      : 'bg-gray-200/95 dark:bg-gray-700/95 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
                   } disabled:opacity-50 backdrop-blur-sm`}
                 >
                   {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
@@ -854,7 +924,7 @@ const Chatbot = () => {
               <button
                 onClick={handleSendMessage}
                 disabled={!inputMessage.trim() || isTyping}
-                className={`p-3 bg-gradient-to-r ${currentTheme.primary} text-white rounded-xl hover:opacity-90 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 touch-manipulation shadow-sm hover:shadow-md backdrop-blur-sm hover:scale-105 transform`}
+                className={`p-3 bg-gradient-to-r ${currentTheme.primary} text-white rounded-xl hover:opacity-90 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-all duration-200 touch-manipulation shadow-sm hover:shadow-md backdrop-blur-sm hover:scale-105 transform disabled:hover:scale-100`}
               >
                 <Send className="h-4 w-4" />
               </button>
