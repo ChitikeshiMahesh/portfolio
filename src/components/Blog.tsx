@@ -1,7 +1,8 @@
 import React from 'react';
 import { Calendar, Clock, Eye, ArrowRight, Brain, Code, Zap, BookOpen, Target, Lightbulb, Plus, ChevronDown, ChevronUp, X, ArrowLeft, ExternalLink } from 'lucide-react';
 
-const Blog = () => {
+// Memoized Blog component for better performance
+const Blog = React.memo(() => {
   const [showAllPosts, setShowAllPosts] = React.useState(false);
   const [postViews, setPostViews] = React.useState({});
 
@@ -467,9 +468,100 @@ print(svd_recs)</pre>
   };
 
   // Function to close modal and go back
-  const handleBackToList = () => {
+  const handleBackToList = React.useCallback(() => {
     setSelectedPost(null);
-  };
+  }, []);
+
+  // Memoized blog post card component
+  const BlogPostCard = React.memo(({ post, index }) => (
+    <article
+      key={post.id}
+      className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-600 group cursor-pointer will-change-transform ${
+        post.featured ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
+      } ${
+        index >= 2 && !showAllPosts ? 'animate-fade-in' : ''
+      }`}
+      onClick={() => handlePostClick(post)}
+      style={{
+        animationDelay: index >= 2 ? `${(index - 2) * 0.1}s` : '0s'
+      }}
+    >
+      <div className="relative overflow-hidden">
+        <img
+          src={post.image}
+          alt={post.title}
+          className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          loading="lazy"
+          decoding="async"
+        />
+        <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 flex flex-col space-y-1 sm:space-y-2">
+          {post.featured && (
+            <div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium">
+              <Brain className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              <span>Featured</span>
+            </div>
+          )}
+          <span className="bg-blue-600 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium">
+            {post.category}
+          </span>
+        </div>
+        <div className="absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-black/50 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs flex items-center space-x-1">
+          <Eye className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+          <span className="font-medium">{postViews[post.id] || 0}</span>
+        </div>
+      </div>
+
+      <div className="p-3 sm:p-4 md:p-6">
+        <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2 sm:mb-3">
+          <div className="flex items-center space-x-1">
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span>{formatDate(post.date)}</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span>{post.readTime}</span>
+          </div>
+        </div>
+
+        <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+          {post.title}
+        </h3>
+
+        <p className="text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 text-xs sm:text-sm leading-relaxed">
+          {post.excerpt}
+        </p>
+
+        <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
+          {post.tags.slice(0, 3).map((tag, index) => (
+            <span
+              key={index}
+              className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full"
+            >
+              {tag}
+            </span>
+          ))}
+          {post.tags.length > 3 && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              +{post.tags.length - 3}
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center justify-between">
+          <button className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-xs sm:text-sm flex items-center space-x-1 group-hover:underline">
+            <span>Read More</span>
+            <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
+          </button>
+          <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400">
+            <Eye className="h-3 w-3" />
+            <span className="font-medium">{postViews[post.id] || 0} views</span>
+          </div>
+        </div>
+      </div>
+    </article>
+  ));
+
+  BlogPostCard.displayName = 'BlogPostCard';
 
   return (
     <section id="blog" className="py-12 sm:py-16 md:py-20 bg-white dark:bg-gray-900 transition-colors duration-300">
@@ -524,89 +616,7 @@ print(svd_recs)</pre>
         {/* Blog Posts Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 max-w-5xl mx-auto">
           {displayedPosts.map((post, index) => (
-            <article
-              key={post.id}
-              className={`bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-blue-200 dark:hover:border-blue-600 group cursor-pointer ${
-                post.featured ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
-              } ${
-                index >= 2 && !showAllPosts ? 'animate-fade-in' : ''
-              }`}
-              onClick={() => handlePostClick(post)}
-              style={{
-                animationDelay: index >= 2 ? `${(index - 2) * 0.1}s` : '0s'
-              }}
-            >
-              <div className="relative overflow-hidden">
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute top-2 sm:top-3 md:top-4 left-2 sm:left-3 md:left-4 flex flex-col space-y-1 sm:space-y-2">
-                  {post.featured && (
-                    <div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium">
-                      <Brain className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                      <span>Featured</span>
-                    </div>
-                  )}
-                  <span className="bg-blue-600 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium">
-                    {post.category}
-                  </span>
-                </div>
-                <div className="absolute bottom-2 sm:bottom-3 md:bottom-4 right-2 sm:right-3 md:right-4 bg-black/50 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs flex items-center space-x-1">
-                  <Eye className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                  <span className="font-medium">{postViews[post.id] || 0}</span>
-                </div>
-              </div>
-
-              <div className="p-3 sm:p-4 md:p-6">
-                <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2 sm:mb-3">
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span>{formatDate(post.date)}</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Clock className="h-3 w-3 sm:h-4 sm:w-4" />
-                    <span>{post.readTime}</span>
-                  </div>
-                </div>
-
-                <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
-                  {post.title}
-                </h3>
-
-                <p className="text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 text-xs sm:text-sm leading-relaxed">
-                  {post.excerpt}
-                </p>
-
-                <div className="flex flex-wrap gap-1 sm:gap-2 mb-3 sm:mb-4">
-                  {post.tags.slice(0, 3).map((tag, index) => (
-                    <span
-                      key={index}
-                      className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                  {post.tags.length > 3 && (
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      +{post.tags.length - 3}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <button className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium text-xs sm:text-sm flex items-center space-x-1 group-hover:underline">
-                    <span>Read More</span>
-                    <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4" />
-                  </button>
-                  <div className="flex items-center space-x-1 text-xs text-gray-500 dark:text-gray-400">
-                    <Eye className="h-3 w-3" />
-                    <span className="font-medium">{postViews[post.id] || 0} views</span>
-                  </div>
-                </div>
-              </div>
-            </article>
+            <BlogPostCard key={post.id} post={post} index={index} />
           ))}
         </div>
 
@@ -684,7 +694,9 @@ print(svd_recs)</pre>
                   >
                     <X className="h-5 w-5" />
                   </button>
-                </div>
+                className="w-full h-40 sm:h-48 md:h-64 object-cover"
+                loading="lazy"
+                decoding="async"
               </div>
               
               <div className="p-4 sm:p-6 md:p-8">
@@ -817,6 +829,8 @@ print(svd_recs)</pre>
       </div>
     </section>
   );
-};
+});
+
+Blog.displayName = 'Blog';
 
 export default Blog;

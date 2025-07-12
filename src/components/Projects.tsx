@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Github, ExternalLink, Eye, X, Star, Users, ArrowRight, ChevronDown, ChevronUp, Plus } from 'lucide-react';
 
-const Projects = () => {
+// Memoized Projects component for better performance
+const Projects = React.memo(() => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [showAllProjects, setShowAllProjects] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -149,6 +150,117 @@ const Projects = () => {
 
   const hasMoreProjects = filteredProjects.length > 4;
 
+  // Memoized project card component
+  const ProjectCard = React.memo(({ project, index }) => (
+    <div
+      key={project.id}
+      className={`group bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] border border-gray-100 dark:border-gray-700 touch-manipulation will-change-transform ${
+        project.featured ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
+      } ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+      }`}
+      style={{
+        animationDelay: `${700 + index * 150}ms`,
+        transitionDelay: isVisible ? `${700 + index * 150}ms` : '0ms'
+      }}
+    >
+      <div className="relative overflow-hidden">
+        <img
+          src={project.image}
+          alt={project.title}
+          className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+          loading="lazy"
+          decoding="async"
+        />
+        <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col space-y-1 sm:space-y-2">
+          {project.featured && (
+            <div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium shadow-lg">
+              <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
+              <span>Featured</span>
+            </div>
+          )}
+          {project.subtitle && (
+            <span className="bg-blue-600 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium shadow-lg">
+              {project.subtitle}
+            </span>
+          )}
+          {project.status && (
+            <span className="bg-green-600 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium shadow-lg">
+              {project.status}
+            </span>
+          )}
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex justify-between items-center">
+            <button
+              onClick={() => setSelectedProject(project)}
+              className="bg-white/95 text-gray-900 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium hover:bg-white transition-all duration-300 flex items-center space-x-1 touch-manipulation shadow-lg hover:scale-105"
+            >
+              <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span>Details</span>
+            </button>
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <a
+                href={project.githubUrl}
+                className="bg-white/95 text-gray-900 p-2 sm:p-2.5 rounded-full hover:bg-white transition-all duration-300 touch-manipulation shadow-lg hover:scale-110 flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
+                aria-label="View GitHub Repository"
+              >
+                <Github className="h-4 w-4 sm:h-5 sm:w-5" />
+              </a>
+              <a
+                href={project.liveUrl}
+                className="bg-white/95 text-gray-900 p-2 sm:p-2.5 rounded-full hover:bg-white transition-all duration-300 touch-manipulation shadow-lg hover:scale-110 flex items-center justify-center"
+                onClick={(e) => e.stopPropagation()}
+                aria-label="View Live Demo"
+              >
+                <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-3 sm:p-4 md:p-6">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex-1">
+            <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+              {project.title}
+            </h3>
+            {project.releaseDate && (
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-light">
+                Release: {project.releaseDate} • Demo: {project.demoStatus}
+              </p>
+            )}
+          </div>
+          <span className="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full ml-2 flex-shrink-0 font-medium">
+            {project.category}
+          </span>
+        </div>
+        <p className="text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 text-xs sm:text-sm leading-relaxed font-light">
+          {project.description}
+        </p>
+        <div className="flex flex-wrap gap-1 sm:gap-2">
+          {project.technologies.slice(0, 3).map((tech, index) => (
+            <span
+              key={index}
+              className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-medium"
+            >
+              {tech}
+            </span>
+          ))}
+          {project.technologies.length > 3 && (
+            <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+              +{project.technologies.length - 3}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  ));
+
+  ProjectCard.displayName = 'ProjectCard';
+
   return (
     <section 
       id="projects" 
@@ -224,109 +336,7 @@ const Projects = () => {
         {/* Projects Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {displayedProjects.map((project, index) => (
-            <div
-              key={project.id}
-              className={`group bg-white dark:bg-gray-900 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-[1.02] border border-gray-100 dark:border-gray-700 touch-manipulation ${
-                project.featured ? 'ring-2 ring-blue-500 dark:ring-blue-400' : ''
-              } ${
-                isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-              style={{
-                animationDelay: `${700 + index * 150}ms`,
-                transitionDelay: isVisible ? `${700 + index * 150}ms` : '0ms'
-              }}
-            >
-              <div className="relative overflow-hidden">
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-40 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute top-2 sm:top-3 left-2 sm:left-3 flex flex-col space-y-1 sm:space-y-2">
-                  {project.featured && (
-                    <div className="flex items-center space-x-1 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium shadow-lg">
-                      <Star className="h-2.5 w-2.5 sm:h-3 sm:w-3" />
-                      <span>Featured</span>
-                    </div>
-                  )}
-                  {project.subtitle && (
-                    <span className="bg-blue-600 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium shadow-lg">
-                      {project.subtitle}
-                    </span>
-                  )}
-                  {project.status && (
-                    <span className="bg-green-600 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-xs font-medium shadow-lg">
-                      {project.status}
-                    </span>
-                  )}
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex justify-between items-center">
-                    <button
-                      onClick={() => setSelectedProject(project)}
-                      className="bg-white/95 text-gray-900 px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium hover:bg-white transition-all duration-300 flex items-center space-x-1 touch-manipulation shadow-lg hover:scale-105"
-                    >
-                      <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
-                      <span>Details</span>
-                    </button>
-                    <div className="flex items-center space-x-2 sm:space-x-3">
-                      <a
-                        href={project.githubUrl}
-                        className="bg-white/95 text-gray-900 p-2 sm:p-2.5 rounded-full hover:bg-white transition-all duration-300 touch-manipulation shadow-lg hover:scale-110 flex items-center justify-center"
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label="View GitHub Repository"
-                      >
-                        <Github className="h-4 w-4 sm:h-5 sm:w-5" />
-                      </a>
-                      <a
-                        href={project.liveUrl}
-                        className="bg-white/95 text-gray-900 p-2 sm:p-2.5 rounded-full hover:bg-white transition-all duration-300 touch-manipulation shadow-lg hover:scale-110 flex items-center justify-center"
-                        onClick={(e) => e.stopPropagation()}
-                        aria-label="View Live Demo"
-                      >
-                        <ExternalLink className="h-4 w-4 sm:h-5 sm:w-5" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-3 sm:p-4 md:p-6">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-                      {project.title}
-                    </h3>
-                    {project.releaseDate && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 font-light">
-                        Release: {project.releaseDate} • Demo: {project.demoStatus}
-                      </p>
-                    )}
-                  </div>
-                  <span className="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400 px-2 py-1 rounded-full ml-2 flex-shrink-0 font-medium">
-                    {project.category}
-                  </span>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300 mb-3 sm:mb-4 text-xs sm:text-sm leading-relaxed font-light">
-                  {project.description}
-                </p>
-                <div className="flex flex-wrap gap-1 sm:gap-2">
-                  {project.technologies.slice(0, 3).map((tech, index) => (
-                    <span
-                      key={index}
-                      className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full font-medium"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                  {project.technologies.length > 3 && (
-                    <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                      +{project.technologies.length - 3}
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
+            <ProjectCard key={project.id} project={project} index={index} />
           ))}
         </div>
 
@@ -370,6 +380,8 @@ const Projects = () => {
                   src={selectedProject.image}
                   alt={selectedProject.title}
                   className="w-full h-40 sm:h-48 md:h-64 object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
                 {/* Fixed Close Button with Better Alignment */}
                 <button
@@ -510,6 +522,8 @@ const Projects = () => {
       </div>
     </section>
   );
-};
+});
+
+Projects.displayName = 'Projects';
 
 export default Projects;
