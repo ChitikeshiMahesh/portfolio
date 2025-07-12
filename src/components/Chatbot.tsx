@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 
-// Memoized Chatbot component for better performance
-const Chatbot = React.memo(() => {
+const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
@@ -16,9 +15,9 @@ const Chatbot = React.memo(() => {
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = React.useCallback(() => {
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, []);
+  };
 
   useEffect(() => {
     scrollToBottom();
@@ -125,7 +124,7 @@ const Chatbot = React.memo(() => {
     return "That's an interesting question! While I can provide information about Mahesh's projects, skills, education, and experience, I might not have specific details about that topic. You can always contact Mahesh directly for more detailed discussions. Is there anything else about his background or work you'd like to know?";
   };
 
-  const handleSendMessage = React.useCallback(() => {
+  const handleSendMessage = () => {
     if (!inputMessage.trim()) return;
 
     const userMessage = {
@@ -150,22 +149,22 @@ const Chatbot = React.memo(() => {
       setMessages(prev => [...prev, botResponse]);
       setIsTyping(false);
     }, 1000 + Math.random() * 1000);
-  }, [inputMessage, messages.length]);
+  };
 
-  const handleSuggestionClick = React.useCallback((suggestion) => {
+  const handleSuggestionClick = (suggestion) => {
     setInputMessage(suggestion);
-  }, []);
+  };
 
-  const formatTime = React.useCallback((timestamp) => {
+  const formatTime = (timestamp) => {
     return timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }, []);
+  };
 
   return (
     <>
       {/* Chatbot Toggle Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 p-3 md:p-4 rounded-full shadow-lg transition-all duration-300 touch-manipulation will-change-transform ${
+        className={`fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 p-3 md:p-4 rounded-full shadow-lg transition-all duration-300 touch-manipulation ${
           isOpen 
             ? 'bg-red-500 hover:bg-red-600' 
             : 'bg-indigo-600 hover:bg-indigo-700'
@@ -289,8 +288,6 @@ const Chatbot = React.memo(() => {
       )}
     </>
   );
-});
-
-Chatbot.displayName = 'Chatbot';
+};
 
 export default Chatbot;

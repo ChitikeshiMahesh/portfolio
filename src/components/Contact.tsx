@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Download, Eye, X, Check } from 'lucide-react';
 
-// Memoized Contact component for better performance
-const Contact = React.memo(() => {
+const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -15,15 +14,15 @@ const Contact = React.memo(() => {
   const [isResumeOpen, setIsResumeOpen] = useState(false);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
-  const handleInputChange = React.useCallback((e) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-  }, []);
+  };
 
-  const handleSubmit = React.useCallback(async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus(null);
@@ -80,20 +79,20 @@ const Contact = React.memo(() => {
       // Auto-hide status message after 5 seconds
       setTimeout(() => setSubmitStatus(null), 5000);
     }
-  }, [formData]);
+  };
 
-  const handleDownloadResume = React.useCallback(() => {
+  const handleDownloadResume = () => {
     const link = document.createElement('a');
     link.href = '/Resume_Mahesh.pdf';
     link.download = 'Mahesh_Resume.pdf';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }, []);
+  };
 
-  const handleViewResume = React.useCallback(() => {
+  const handleViewResume = () => {
     setIsResumeOpen(true);
-  }, []);
+  };
 
   const contactInfo = [
     {
@@ -422,8 +421,6 @@ const Contact = React.memo(() => {
       )}
     </>
   );
-});
-
-Contact.displayName = 'Contact';
+};
 
 export default Contact;
